@@ -1,0 +1,60 @@
+{
+  "team_a_name": "Team A",
+  "team_b_name": "Team B",
+  "sets_a": 0,
+  "sets_b": 0,
+  "points_a": 0,
+  "points_b": 0,
+  "serving_team": "A",
+  "status_message": "进行中",
+  "event_name": "",
+  "match_stage": "",
+  "match_venue": "",
+  "umpire": "",
+  "service_judge": "",
+  "start_time": "2025-12-19 14:49",
+  "end_time": "",
+  "fullState": {
+    "mode": "MS",
+    "matchInfo": {
+      "eventName": "",
+      "stage": "",
+      "venue": "",
+      "umpire": "",
+      "serviceJudge": "",
+      "startTime": "2025-12-19T14:49",
+      "endTime": ""
+    },
+    "settings": {
+      "maxSets": 3,
+      "pointsPerSet": 21,
+      "capPoints": 30
+    },
+    "teamA": {
+      "name": "Team A",
+      "p1": "Player A1",
+      "p2": "Player A2",
+      "score": 0,
+      "sets": 0,
+      "positions": {
+        "p1": 0,
+        "p2": 1
+      }
+    },
+    "teamB": {
+      "name": "Team B",
+      "p1": "Player B1",
+      "p2": "Player B2",
+      "score": 0,
+      "sets": 0,
+      "positions": {
+        "p1": 0,
+        "p2": 1
+      }
+    },
+    "servingTeam": "A",
+    "serverPlayer": "p1",
+    "leftSideTeam": "A",
+    "isActive": true
+  }
+}

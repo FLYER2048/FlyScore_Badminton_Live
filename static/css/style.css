@@ -1,0 +1,148 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.settings-panel {
+    background-color: #fff;
+    border-right: 1px solid #dee2e6;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.scoreboard {
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.score-display {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* 羽毛球场地可视化 */
+.court-container {
+    width: 100%;
+    padding-top: 50%; /* Aspect Ratio 2:1 approx */
+    position: relative;
+    background-color: #198754; /* Green court */
+    border: 2px solid #fff;
+}
+
+.court {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 2px solid white;
+}
+
+.net {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: #ddd; /* Net color */
+    border-left: 1px dashed #333;
+    z-index: 10;
+}
+
+.center-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: white;
+}
+
+/* 发球线 - 简化版，不画那么细致的双打后发球线，主要示意区域 */
+.service-line-short-a {
+    position: absolute;
+    left: 15%; /* Short service line A */
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: white;
+}
+
+.service-line-short-b {
+    position: absolute;
+    right: 15%; /* Short service line B */
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: white;
+}
+
+.court-zone {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+    font-size: 0.8rem;
+    flex-direction: column;
+    transition: background-color 0.3s;
+}
+
+/* Zones */
+/* Team A (Left) */
+/* Top Left */
+.zone-tl {
+    top: 0;
+    left: 0;
+    height: 50%;
+    width: 50%;
+    border-right: 1px solid rgba(255,255,255,0.5);
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+}
+/* Bottom Left */
+.zone-bl {
+    top: 50%;
+    left: 0;
+    height: 50%;
+    width: 50%;
+    border-right: 1px solid rgba(255,255,255,0.5);
+    border-top: 1px solid rgba(255,255,255,0.5);
+}
+
+/* Team B (Right) */
+/* Top Right */
+.zone-tr {
+    top: 0;
+    left: 50%;
+    height: 50%;
+    width: 50%;
+    border-left: 1px solid rgba(255,255,255,0.5);
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+}
+/* Bottom Right */
+.zone-br {
+    top: 50%;
+    left: 50%;
+    height: 50%;
+    width: 50%;
+    border-left: 1px solid rgba(255,255,255,0.5);
+    border-top: 1px solid rgba(255,255,255,0.5);
+}
+
+.active-zone {
+    background-color: rgba(255, 255, 0, 0.3); /* Yellow highlight */
+}
+
+.server-indicator::after {
+    content: " 🏸";
+}
+
+.court-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 20;
+}

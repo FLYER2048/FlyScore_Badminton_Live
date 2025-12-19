@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羽毛球比赛计分系统 - FlyScore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <!-- 左侧：设置与控制 -->
+            <div class="col-md-3 settings-panel">
+                <div class="card mb-3">
+                    <div class="card-header bg-primary text-white">比赛设置</div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <label class="form-label">比赛模式</label>
+                            <select id="matchMode" class="form-select">
+                                <option value="MS">男单 (MS)</option>
+                                <option value="WS">女单 (WS)</option>
+                                <option value="MD">男双 (MD)</option>
+                                <option value="WD">女双 (WD)</option>
+                                <option value="XD">混双 (XD)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 队伍 A 设置 -->
+                        <div class="mb-2 border-bottom pb-2">
+                            <label class="form-label fw-bold text-danger">Team A (左侧)</label>
+                            <input type="text" id="teamAName" class="form-control mb-1" placeholder="队伍名称 (如: 中国队)">
+                            <div class="row g-1">
+                                <div class="col"><input type="text" id="playerA1" class="form-control form-control-sm" placeholder="球员1"></div>
+                                <div class="col"><input type="text" id="playerA2" class="form-control form-control-sm" placeholder="球员2 (双打)"></div>
+                            </div>
+                        </div>
+
+                        <!-- 队伍 B 设置 -->
+                        <div class="mb-2 border-bottom pb-2">
+                            <label class="form-label fw-bold text-primary">Team B (右侧)</label>
+                            <input type="text" id="teamBName" class="form-control mb-1" placeholder="队伍名称 (如: 日本队)">
+                            <div class="row g-1">
+                                <div class="col"><input type="text" id="playerB1" class="form-control form-control-sm" placeholder="球员1"></div>
+                                <div class="col"><input type="text" id="playerB2" class="form-control form-control-sm" placeholder="球员2 (双打)"></div>
+                            </div>
+                        </div>
+
+                        <!-- 规则设置 -->
+                        <div class="mb-2">
+                            <label class="form-label">规则</label>
+                            <div class="input-group input-group-sm mb-1">
+                                <span class="input-group-text">局数</span>
+                                <input type="number" id="maxSets" class="form-control" value="3">
+                                <span class="input-group-text">胜</span>
+                            </div>
+                            <div class="input-group input-group-sm mb-1">
+                                <span class="input-group-text">每局</span>
+                                <input type="number" id="pointsPerSet" class="form-control" value="21">
+                                <span class="input-group-text">分</span>
+                            </div>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">封顶</span>
+                                <input type="number" id="capPoints" class="form-control" value="30">
+                                <span class="input-group-text">分</span>
+                            </div>
+                        </div>
+
+                        <button id="btnStartMatch" class="btn btn-success w-100">开始/重置比赛</button>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">赛事信息</div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <input type="text" id="eventName" class="form-control form-control-sm mb-1" placeholder="赛事名称">
+                            <input type="text" id="matchStage" class="form-control form-control-sm mb-1" placeholder="比赛阶段 (如: 决赛)">
+                            <input type="text" id="matchVenue" class="form-control form-control-sm mb-1" placeholder="比赛地点">
+                        </div>
+                        <div class="mb-2">
+                            <div class="row g-1">
+                                <div class="col"><input type="text" id="umpireName" class="form-control form-control-sm" placeholder="主裁判"></div>
+                                <div class="col"><input type="text" id="serviceJudgeName" class="form-control form-control-sm" placeholder="副裁判"></div>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small text-muted">时间 (自动/手动)</label>
+                            <input type="datetime-local" id="startTime" class="form-control form-control-sm mb-1">
+                            <input type="datetime-local" id="endTime" class="form-control form-control-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">控制台</div>
+                    <div class="card-body d-grid gap-2">
+                        <button id="btnUndo" class="btn btn-secondary" disabled>撤销上一步</button>
+                        <button id="btnSwapSides" class="btn btn-warning" disabled>交换场地</button>
+                        <button id="btnChangeServer" class="btn btn-info" disabled>手动换发球权</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：比分与场地 -->
+            <div class="col-md-9">
+                <div class="row justify-content-center">
+                    <!-- 中间：计分板 -->
+                    <div class="col-12 text-center">
+                        <div class="scoreboard card mb-3">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <!-- Team A Score -->
+                                    <div class="col-5 team-score-area team-a-area" id="areaTeamA">
+                                        <h3 id="displayTeamA">Team A</h3>
+                                        <div class="score-display display-1 fw-bold text-danger" id="scoreA">0</div>
+                                        <div class="sets-display h4">Sets: <span id="setsA">0</span></div>
+                                        <button class="btn btn-outline-danger btn-lg w-100 mt-2 btn-add-score" data-team="A" disabled>+1 分</button>
+                                    </div>
+                                    
+                                    <!-- VS -->
+                                    <div class="col-2">
+                                        <div class="h2 text-muted">VS</div>
+                                        <div id="matchStatus" class="badge bg-secondary text-wrap" style="width: 6rem;">Ready</div>
+                                    </div>
+
+                                    <!-- Team B Score -->
+                                    <div class="col-5 team-score-area team-b-area" id="areaTeamB">
+                                        <h3 id="displayTeamB">Team B</h3>
+                                        <div class="score-display display-1 fw-bold text-primary" id="scoreB">0</div>
+                                        <div class="sets-display h4">Sets: <span id="setsB">0</span></div>
+                                        <button class="btn btn-outline-primary btn-lg w-100 mt-2 btn-add-score" data-team="B" disabled>+1 分</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 裁判提示信息 -->
+                        <div class="alert alert-warning d-none" id="refereeAlert" role="alert">
+                            <strong>裁判提示:</strong> <span id="refereeMessage"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center mt-3">
+                    <!-- 下方：场地可视化 -->
+                    <div class="col-10 col-lg-8">
+                        <div class="card">
+                            <div class="card-header">场地视图 (自动站位)</div>
+                            <div class="card-body p-0">
+                                <div class="court-container">
+                                    <!-- 羽毛球场地 CSS 绘制 -->
+                                    <div class="court">
+                                        <div class="net"></div>
+                                        <div class="center-line"></div>
+                                        <div class="service-line-short-a"></div>
+                                        <div class="service-line-short-b"></div>
+                                        <div class="service-line-long-a"></div> <!-- 单打后发球线 -->
+                                        <div class="service-line-long-b"></div>
+                                        <div class="side-line-single-top"></div>
+                                        <div class="side-line-single-bottom"></div>
+
+                                        <!-- 4个半区 -->
+                                        <!-- 左侧 (通常 Team A) -->
+                                        <div class="court-zone zone-tl" id="zone_0_1"></div> <!-- Top Left (Odd) -->
+                                        <div class="court-zone zone-bl" id="zone_0_0"></div> <!-- Bottom Left (Even) -->
+                                        
+                                        <!-- 右侧 (通常 Team B) -->
+                                        <div class="court-zone zone-tr" id="zone_1_1"></div> <!-- Top Right (Odd) -->
+                                        <div class="court-zone zone-br" id="zone_1_0"></div> <!-- Bottom Right (Even) -->
+                                        
+                                        <!-- 遮罩层 -->
+                                        <div id="courtOverlay" class="court-overlay d-flex justify-content-center align-items-center">
+                                            <h3 class="text-white bg-dark p-2 rounded opacity-75">准备中...</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-2 text-muted small">
+                                    <p>说明：<br>
+                                    🏸 = 发球方<br>
+                                    黄色高亮 = 当前发球/接发球区域<br>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
