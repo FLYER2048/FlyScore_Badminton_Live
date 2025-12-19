@@ -1,11 +1,22 @@
 from flask import Flask, render_template, request, jsonify
 import os
 import json
+import sys
 
-app = Flask(__name__)
+# 判断是否为打包环境
+if getattr(sys, 'frozen', False):
+    # 打包后的资源路径 (sys._MEIPASS)
+    template_folder = os.path.join(sys._MEIPASS, 'templates')
+    static_folder = os.path.join(sys._MEIPASS, 'static')
+    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+    # 输出目录在 exe 同级
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    # 开发环境
+    app = Flask(__name__)
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 配置输出目录
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, 'output')
 
 # 定义子目录结构
@@ -99,4 +110,9 @@ def update_status():
     return jsonify({"status": "success"})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # 打包后禁用 debug
+    debug_mode = not getattr(sys, 'frozen', False)
+    if not debug_mode:
+        print("FlyScore Server is running on http://127.0.0.1:5000")
+        print("Close this window to stop the server.")
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)

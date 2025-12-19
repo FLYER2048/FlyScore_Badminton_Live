@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         teamA: {
             name: 'Team A',
+            color: '#dc3545', // Default Red
             p1: 'A1',
             p2: 'A2',
             score: 0,
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         teamB: {
             name: 'Team B',
+            color: '#0d6efd', // Default Blue
             p1: 'B1',
             p2: 'B2',
             score: 0,
@@ -54,9 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
         serviceJudgeName: document.getElementById('serviceJudgeName'),
         startTime: document.getElementById('startTime'),
         endTime: document.getElementById('endTime'),
+        teamAColor: document.getElementById('teamAColor'),
         teamAName: document.getElementById('teamAName'),
         playerA1: document.getElementById('playerA1'),
         playerA2: document.getElementById('playerA2'),
+        teamBColor: document.getElementById('teamBColor'),
         teamBName: document.getElementById('teamBName'),
         playerB1: document.getElementById('playerB1'),
         playerB2: document.getElementById('playerB2'),
@@ -76,6 +80,8 @@ document.addEventListener('DOMContentLoaded', function() {
         btnUndo: document.getElementById('btnUndo'),
         btnSwapSides: document.getElementById('btnSwapSides'),
         btnChangeServer: document.getElementById('btnChangeServer'),
+        btnSwapPlayersA: document.getElementById('btnSwapPlayersA'),
+        btnSwapPlayersB: document.getElementById('btnSwapPlayersB'),
         btnAddScores: document.querySelectorAll('.btn-add-score'),
         zones: {
             a_odd: document.getElementById('zone_0_1'), // Top Left
@@ -90,6 +96,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('btnUndo').addEventListener('click', undo);
     document.getElementById('btnSwapSides').addEventListener('click', swapSides); // 仅视觉交换？还是逻辑交换？这里暂不做复杂逻辑，仅重置
     document.getElementById('btnChangeServer').addEventListener('click', manualChangeServer);
+    if(els.btnSwapPlayersA) els.btnSwapPlayersA.addEventListener('click', () => swapPlayers('A'));
+    if(els.btnSwapPlayersB) els.btnSwapPlayersB.addEventListener('click', () => swapPlayers('B'));
     
     document.querySelectorAll('.btn-add-score').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -185,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.settings.capPoints = parseInt(els.capPoints.value) || 30;
 
         gameState.teamA.name = els.teamAName.value || 'Team A';
+        gameState.teamA.color = els.teamAColor.value || '#dc3545';
         gameState.teamA.p1 = els.playerA1.value || 'Player A1';
         gameState.teamA.p2 = els.playerA2.value || 'Player A2';
         gameState.teamA.score = 0;
@@ -192,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.teamA.positions = { p1: 0, p2: 1 }; // Reset positions
 
         gameState.teamB.name = els.teamBName.value || 'Team B';
+        gameState.teamB.color = els.teamBColor.value || '#0d6efd';
         gameState.teamB.p1 = els.playerB1.value || 'Player B1';
         gameState.teamB.p2 = els.playerB2.value || 'Player B2';
         gameState.teamB.score = 0;
@@ -221,6 +231,11 @@ document.addEventListener('DOMContentLoaded', function() {
         els.btnUndo.disabled = !gameActive;
         els.btnSwapSides.disabled = !gameActive;
         els.btnChangeServer.disabled = !gameActive;
+        
+        const isDoubles = gameState.mode.includes('D');
+        if(els.btnSwapPlayersA) els.btnSwapPlayersA.disabled = !gameActive || !isDoubles;
+        if(els.btnSwapPlayersB) els.btnSwapPlayersB.disabled = !gameActive || !isDoubles;
+
         els.btnAddScores.forEach(btn => btn.disabled = !gameActive);
         
         // 遮罩层
@@ -233,8 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // 输入框 (比赛进行时禁用)
         const inputs = [
             els.mode, els.maxSets, els.pointsPerSet, els.capPoints,
-            els.teamAName, els.playerA1, els.playerA2,
-            els.teamBName, els.playerB1, els.playerB2,
+            els.teamAName, els.teamAColor, els.playerA1, els.playerA2,
+            els.teamBName, els.teamBColor, els.playerB1, els.playerB2,
             els.eventName, els.matchStage, els.matchVenue,
             els.umpireName, els.serviceJudgeName, els.startTime, els.endTime
         ];
@@ -356,6 +371,25 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => els.refereeAlert.classList.add('d-none'), 5000);
     }
 
+    function swapPlayers(teamId) {
+        // Check if doubles
+        if (!gameState.mode.includes('D')) {
+            alert("单打模式无法交换球员站位");
+            return;
+        }
+        
+        saveState();
+        const team = teamId === 'A' ? gameState.teamA : gameState.teamB;
+        
+        // Swap positions
+        const temp = team.positions.p1;
+        team.positions.p1 = team.positions.p2;
+        team.positions.p2 = temp;
+        
+        updateUI();
+        sendToBackend();
+    }
+
     // 核心：更新 UI 和 计算站位
     function updateUI() {
         // 确定左右侧队伍
@@ -369,17 +403,33 @@ document.addEventListener('DOMContentLoaded', function() {
         els.scoreA.textContent = leftTeam.score;
         els.setsA.textContent = leftTeam.sets;
         
+        // Apply Colors to Left Side
+        els.scoreA.style.color = leftTeam.color;
+        els.scoreA.classList.remove('text-danger', 'text-primary'); // Remove default classes
+        
         // 更新左侧按钮
         const leftBtn = document.querySelector('#areaTeamA .btn-add-score');
-        if(leftBtn) leftBtn.setAttribute('data-team', leftTeamId);
+        if(leftBtn) {
+            leftBtn.setAttribute('data-team', leftTeamId);
+            leftBtn.style.color = leftTeam.color;
+            leftBtn.style.borderColor = leftTeam.color;
+        }
 
         els.displayTeamB.textContent = rightTeam.name;
         els.scoreB.textContent = rightTeam.score;
         els.setsB.textContent = rightTeam.sets;
 
+        // Apply Colors to Right Side
+        els.scoreB.style.color = rightTeam.color;
+        els.scoreB.classList.remove('text-danger', 'text-primary'); // Remove default classes
+
         // 更新右侧按钮
         const rightBtn = document.querySelector('#areaTeamB .btn-add-score');
-        if(rightBtn) rightBtn.setAttribute('data-team', rightTeamId);
+        if(rightBtn) {
+            rightBtn.setAttribute('data-team', rightTeamId);
+            rightBtn.style.color = rightTeam.color;
+            rightBtn.style.borderColor = rightTeam.color;
+        }
 
         // 2. 比赛状态文字
         let status = "进行中";
@@ -493,6 +543,136 @@ document.addEventListener('DOMContentLoaded', function() {
              const nameDiv = serverZone.querySelector('div');
              if (nameDiv) nameDiv.classList.add('server-indicator');
         }
+
+        updateCourtHighlights();
+    }
+
+    function updateCourtHighlights() {
+        const isDoubles = gameState.mode.includes('D');
+        const validArea = document.getElementById('validAreaHighlight');
+        const serviceArea = document.getElementById('serviceAreaHighlight'); // Receiver
+        const serverArea = document.getElementById('serverAreaHighlight'); // Server
+        
+        if (!validArea || !serviceArea || !serverArea) return;
+
+        // 1. Highlight Valid Play Area
+        validArea.className = isDoubles ? 'highlight-valid-doubles' : 'highlight-valid-singles';
+
+        // 2. Highlight Service & Server Areas
+        // Determine server and score
+        const servingTeamId = gameState.servingTeam;
+        const servingTeamObj = servingTeamId === 'A' ? gameState.teamA : gameState.teamB;
+        const score = servingTeamObj.score;
+        const isEven = score % 2 === 0;
+        
+        // Determine side (Left/Right of court)
+        const isLeft = servingTeamId === gameState.leftSideTeam;
+        
+        // Variables for Receiver (Service Area)
+        let rTop, rBottom, rLeft, rRight;
+        // Variables for Server (Server Area)
+        let sTop, sBottom, sLeft, sRight;
+        
+        if (isLeft) {
+            // Server is on Left
+            // Server Position:
+            // Even -> Bottom Left (Right Service Court for them) -> top:50%, bottom:0%
+            // Odd -> Top Left (Left Service Court for them) -> top:0%, bottom:50%
+            if (isEven) {
+                sTop = '50%'; sBottom = '0%';
+            } else {
+                sTop = '0%'; sBottom = '50%';
+            }
+            
+            // Receiver Position (Target is Right):
+            // Even -> Diagonal -> Top Right -> top:0%, bottom:50%
+            // Odd -> Diagonal -> Bottom Right -> top:50%, bottom:0%
+            if (isEven) {
+                rTop = '0%'; rBottom = '50%';
+            } else {
+                rTop = '50%'; rBottom = '0%';
+            }
+
+        } else {
+            // Server is on Right
+            // Server Position:
+            // Even -> Top Right -> top:0%, bottom:50%
+            // Odd -> Bottom Right -> top:50%, bottom:0%
+            if (isEven) {
+                sTop = '0%'; sBottom = '50%';
+            } else {
+                sTop = '50%'; sBottom = '0%';
+            }
+
+            // Receiver Position (Target is Left):
+            // Even -> Diagonal -> Bottom Left -> top:50%, bottom:0%
+            // Odd -> Diagonal -> Top Left -> top:0%, bottom:50%
+            if (isEven) {
+                rTop = '50%'; rBottom = '0%';
+            } else {
+                rTop = '0%'; rBottom = '50%';
+            }
+        }
+        
+        // X Axis Logic
+        if (isDoubles) {
+            // Doubles Service: Wide and Short
+            if (isLeft) {
+                // Server (Left): Back Boundary (Doubles) to Short Line
+                // line-long-service-doubles-a (5.67%) to line-short-service-a (35.23%)
+                sLeft = '5.67%'; sRight = '64.77%'; // 100 - 35.23 = 64.77
+                
+                // Receiver (Right): Short Line to Back Boundary (Doubles)
+                rLeft = '64.77%'; rRight = '5.67%';
+            } else {
+                // Server (Right)
+                sLeft = '64.77%'; sRight = '5.67%';
+                
+                // Receiver (Left)
+                rLeft = '5.67%'; rRight = '64.77%';
+            }
+        } else {
+            // Singles Service: Narrow and Long
+            // Y Adjustment for Narrowness (Singles Sidelines)
+            // The `top`/`bottom` calculated above are 0% or 50%.
+            // For Singles, we need to shrink them to inside the singles sidelines.
+            // `line-side-singles-top` { top: 7.54% }
+            // `line-side-singles-bottom` { bottom: 7.54% }
+            
+            // Adjust Server Y
+            if (sTop === '0%') sTop = '7.54%';
+            if (sBottom === '0%') sBottom = '7.54%';
+            
+            // Adjust Receiver Y
+            if (rTop === '0%') rTop = '7.54%';
+            if (rBottom === '0%') rBottom = '7.54%';
+            
+            // X Axis Logic
+            if (isLeft) {
+                // Server (Left): Back Boundary (0%) to Short Line (35.23%)
+                sLeft = '0%'; sRight = '64.77%';
+                
+                // Receiver (Right): Short Line (35.23% from Right) to Back Boundary (0% from Right)
+                rLeft = '64.77%'; rRight = '0%';
+            } else {
+                // Server (Right)
+                sLeft = '64.77%'; sRight = '0%';
+                
+                // Receiver (Left)
+                rLeft = '0%'; rRight = '64.77%';
+            }
+        }
+        
+        // Apply Styles
+        serviceArea.style.top = rTop;
+        serviceArea.style.bottom = rBottom;
+        serviceArea.style.left = rLeft;
+        serviceArea.style.right = rRight;
+        
+        serverArea.style.top = sTop;
+        serverArea.style.bottom = sBottom;
+        serverArea.style.left = sLeft;
+        serverArea.style.right = sRight;
     }
 
     function sendToBackend() {
@@ -542,10 +722,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     if(els.capPoints) els.capPoints.value = gameState.settings.capPoints;
                     
                     if(els.teamAName) els.teamAName.value = gameState.teamA.name;
+                    if(els.teamAColor) els.teamAColor.value = gameState.teamA.color || '#dc3545';
                     if(els.playerA1) els.playerA1.value = gameState.teamA.p1;
                     if(els.playerA2) els.playerA2.value = gameState.teamA.p2;
                     
                     if(els.teamBName) els.teamBName.value = gameState.teamB.name;
+                    if(els.teamBColor) els.teamBColor.value = gameState.teamB.color || '#0d6efd';
                     if(els.playerB1) els.playerB1.value = gameState.teamB.p1;
                     if(els.playerB2) els.playerB2.value = gameState.teamB.p2;
 

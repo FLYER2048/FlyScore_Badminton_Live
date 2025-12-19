@@ -33,46 +33,90 @@ body {
     left: 10px;
     right: 10px;
     bottom: 10px;
-    border: 2px solid white;
+    border: 2px solid white; /* Outer Boundary (Doubles Sideline & Back Boundary) */
+    box-sizing: border-box;
 }
 
-.net {
+/* Court Lines */
+.court-line {
     position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background-color: #ddd; /* Net color */
+    background-color: white;
+    z-index: 5;
+}
+
+/* Horizontal Lines (Width-wise) */
+.line-center-left {
+    top: 50%; left: 0; width: 35.23%; height: 2px;
+    z-index: 5;
+}
+.line-center-right {
+    top: 50%; right: 0; width: 35.23%; height: 2px;
+    z-index: 5;
+}
+
+/* Vertical Lines (Length-wise) */
+.line-net {
+    left: 50%; top: 0; bottom: 0; width: 2px; background-color: #ddd; z-index: 10;
     border-left: 1px dashed #333;
-    z-index: 10;
+    transform: translateX(-50%);
 }
 
-.center-line {
+/* Service Lines */
+/* Short Service Lines: 1.98m from net. Total length 13.4m. 1.98/6.7 = ~29.5% from center? No.
+   1.98m / 13.4m = 14.77%.
+   Center is 50%.
+   Left Short: 50 - 14.77 = 35.23%
+   Right Short: 50 + 14.77 = 64.77%
+*/
+.line-short-service-a { left: 35.23%; top: 0; bottom: 0; width: 2px; }
+.line-short-service-b { right: 35.23%; top: 0; bottom: 0; width: 2px; }
+
+/* Doubles Long Service Lines (Back): 0.76m from back.
+   0.76 / 13.4 = 5.67%
+*/
+.line-long-service-doubles-a { left: 5.67%; top: 0; bottom: 0; width: 2px; }
+.line-long-service-doubles-b { right: 5.67%; top: 0; bottom: 0; width: 2px; }
+
+/* Singles Sidelines: 0.46m from side.
+   0.46 / 6.1 = 7.54%
+*/
+.line-side-singles-top { top: 7.54%; left: 0; right: 0; height: 2px; }
+.line-side-singles-bottom { bottom: 7.54%; left: 0; right: 0; height: 2px; }
+
+/* Highlighting */
+.highlight-valid-singles {
+    /* Highlight area for singles: Inner width, Full length */
     position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: white;
+    top: 7.54%; bottom: 7.54%; left: 0; right: 0;
+    border: 3px solid rgba(220, 53, 69, 1); /* Red border */
+    box-shadow: inset 0 0 10px rgba(220, 53, 69, 0.2);
+    pointer-events: none;
+    z-index: 15;
 }
 
-/* 发球线 - 简化版，不画那么细致的双打后发球线，主要示意区域 */
-.service-line-short-a {
+.highlight-valid-doubles {
+    /* Highlight area for doubles: Full width, Full length */
     position: absolute;
-    left: 15%; /* Short service line A */
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background-color: white;
+    top: 0; bottom: 0; left: 0; right: 0;
+    border: 3px solid rgba(220, 53, 69, 1); /* Red border */
+    box-shadow: inset 0 0 10px rgba(220, 53, 69, 0.2);
+    pointer-events: none;
+    z-index: 15;
 }
 
-.service-line-short-b {
+/* Service Area Highlights */
+.service-area-highlight {
+    background-color: rgba(220, 53, 69, 0.4); /* Red overlay for Receiver */
     position: absolute;
-    right: 15%; /* Short service line B */
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background-color: white;
+    z-index: 3;
+    transition: all 0.3s ease;
+}
+
+.server-area-highlight {
+    background-color: rgba(255, 235, 59, 0.6); /* Yellow overlay for Server */
+    position: absolute;
+    z-index: 3;
+    transition: all 0.3s ease;
 }
 
 .court-zone {
@@ -86,51 +130,44 @@ body {
     font-size: 0.8rem;
     flex-direction: column;
     transition: background-color 0.3s;
+    z-index: 6; /* Above lines */
 }
 
 /* Zones */
 /* Team A (Left) */
-/* Top Left */
+/* Top Left (Odd) */
 .zone-tl {
     top: 0;
     left: 0;
     height: 50%;
     width: 50%;
-    border-right: 1px solid rgba(255,255,255,0.5);
-    border-bottom: 1px solid rgba(255,255,255,0.5);
+    /* border-right: 1px solid rgba(255,255,255,0.5); */
 }
-/* Bottom Left */
+/* Bottom Left (Even) */
 .zone-bl {
     top: 50%;
     left: 0;
     height: 50%;
     width: 50%;
-    border-right: 1px solid rgba(255,255,255,0.5);
-    border-top: 1px solid rgba(255,255,255,0.5);
+    /* border-right: 1px solid rgba(255,255,255,0.5); */
 }
 
 /* Team B (Right) */
-/* Top Right */
+/* Top Right (Even) */
 .zone-tr {
     top: 0;
     left: 50%;
     height: 50%;
     width: 50%;
-    border-left: 1px solid rgba(255,255,255,0.5);
-    border-bottom: 1px solid rgba(255,255,255,0.5);
+    /* border-left: 1px solid rgba(255,255,255,0.5); */
 }
-/* Bottom Right */
+/* Bottom Right (Odd) */
 .zone-br {
     top: 50%;
     left: 50%;
     height: 50%;
     width: 50%;
-    border-left: 1px solid rgba(255,255,255,0.5);
-    border-top: 1px solid rgba(255,255,255,0.5);
-}
-
-.active-zone {
-    background-color: rgba(255, 255, 0, 0.3); /* Yellow highlight */
+    /* border-left: 1px solid rgba(255,255,255,0.5); */
 }
 
 .server-indicator::after {
