@@ -12,6 +12,8 @@ FlyScore是一个基于Flask的球赛计分系统，FlyScore Badminton专为羽�
 *   **赛事管理**：支持录入赛事名称、阶段、地点、裁判姓名及比赛时间。
 *   **辅助功能**：支持撤销误操作、交换场地、手动换发球权。
 
+<img width="2523" height="1599" alt="image" src="https://github.com/user-attachments/assets/6fc8e02a-b2a9-4963-bb28-0257ca353615" />
+
 ## 安装与运行
 
 ### 1. 环境要求
@@ -85,3 +87,4 @@ FlyScore_Badminton_Live3/
 └── templates/
     └── index.html      # 前端界面
 ```
+
