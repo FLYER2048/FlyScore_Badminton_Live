@@ -214,6 +214,14 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.isActive = true;
         historyStack = [];
 
+        // Log Match Start
+        logEvent('match_start', {
+            match_info: gameState.matchInfo,
+            settings: gameState.settings,
+            team_a: { name: gameState.teamA.name, p1: gameState.teamA.p1, p2: gameState.teamA.p2 },
+            team_b: { name: gameState.teamB.name, p1: gameState.teamB.p1, p2: gameState.teamB.p2 }
+        });
+
         setControlsState(true);
         updateUI();
         sendToBackend();
@@ -260,6 +268,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 加分逻辑
     function addScore(team) {
+        // Capture info BEFORE score update
+        const rallyInfo = getCurrentRallyInfo();
+
         saveState();
 
         const isDoubles = gameState.mode.includes('D');
@@ -269,15 +280,40 @@ document.addEventListener('DOMContentLoaded', function() {
         // 1. 增加分数
         scoringTeam.score++;
 
+        // Log Point
+        logEvent('point', {
+            winner: team,
+            ...rallyInfo,
+            newScoreA: gameState.teamA.score,
+            newScoreB: gameState.teamB.score
+        });
+
         // 2. 判断是否赢得该局
         if (checkSetWin(scoringTeam.score, otherTeam.score)) {
             scoringTeam.sets++;
+            
+            // Log Set End
+            logEvent('set_end', {
+                 winner: team,
+                 scoreA: gameState.teamA.score,
+                 scoreB: gameState.teamB.score,
+                 setsA: gameState.teamA.sets,
+                 setsB: gameState.teamB.sets
+            });
+
             // 局间重置分数，但保留大比分
             if (checkMatchWin()) {
                 // Set end time
                 const timeStr = getNowDateTimeLocal();
                 els.endTime.value = timeStr;
                 gameState.matchInfo.endTime = timeStr;
+
+                // Log Match End
+                logEvent('match_end', {
+                     winner: team,
+                     finalSetsA: gameState.teamA.sets,
+                     finalSetsB: gameState.teamB.sets
+                });
 
                 showReferee(`比赛结束! ${scoringTeam.name} 获胜!`);
             } else {
@@ -340,6 +376,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const prev = historyStack.pop();
             // 恢复状态
             Object.assign(gameState, JSON.parse(prev));
+
+            logEvent('undo', {
+                restoredScoreA: gameState.teamA.score,
+                restoredScoreB: gameState.teamB.score,
+                restoredSetsA: gameState.teamA.sets,
+                restoredSetsB: gameState.teamB.sets,
+                restoredServingTeam: gameState.servingTeam
+            });
+
             updateUI();
             sendToBackend();
         }
@@ -354,6 +399,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function manualChangeServer() {
         gameState.servingTeam = gameState.servingTeam === 'A' ? 'B' : 'A';
+        
+        logEvent('manual_change', {
+            action: 'change_server',
+            newServingTeam: gameState.servingTeam
+        });
+
         updateUI();
         sendToBackend();
     }
@@ -361,6 +412,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function swapSides() {
         saveState();
         gameState.leftSideTeam = gameState.leftSideTeam === 'A' ? 'B' : 'A';
+        
+        logEvent('swap_sides', {
+            leftSideTeam: gameState.leftSideTeam
+        });
+
         updateUI();
     }
 
@@ -386,6 +442,12 @@ document.addEventListener('DOMContentLoaded', function() {
         team.positions.p1 = team.positions.p2;
         team.positions.p2 = temp;
         
+        logEvent('manual_change', {
+            action: 'swap_players',
+            team: teamId,
+            newPositions: team.positions
+        });
+
         updateUI();
         sendToBackend();
     }
@@ -673,6 +735,58 @@ document.addEventListener('DOMContentLoaded', function() {
         serverArea.style.bottom = sBottom;
         serverArea.style.left = sLeft;
         serverArea.style.right = sRight;
+    }
+
+    function logEvent(type, details) {
+        const payload = {
+            type: type,
+            timestamp: getNowDateTimeLocal(),
+            details: details
+        };
+        fetch('/api/log_event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).catch(err => console.error('Error logging event:', err));
+    }
+
+    function getCurrentRallyInfo() {
+        const servingTeamId = gameState.servingTeam;
+        const receivingTeamId = servingTeamId === 'A' ? 'B' : 'A';
+        
+        const servingTeamObj = servingTeamId === 'A' ? gameState.teamA : gameState.teamB;
+        const receivingTeamObj = receivingTeamId === 'A' ? gameState.teamA : gameState.teamB;
+        
+        const isDoubles = gameState.mode.includes('D');
+        
+        let serverName = '';
+        let receiverName = '';
+
+        if (!isDoubles) {
+            serverName = servingTeamObj.p1;
+            receiverName = receivingTeamObj.p1;
+        } else {
+            // Determine Server
+            const serverPosIndex = servingTeamObj.score % 2; // 0 or 1
+            if (servingTeamObj.positions.p1 === serverPosIndex) serverName = servingTeamObj.p1;
+            else serverName = servingTeamObj.p2;
+            
+            // Determine Receiver
+            const receiverPosIndex = serverPosIndex; // Same index (0 or 1)
+            if (receivingTeamObj.positions.p1 === receiverPosIndex) receiverName = receivingTeamObj.p1;
+            else receiverName = receivingTeamObj.p2;
+        }
+        
+        return {
+            serverTeam: servingTeamId,
+            serverPlayer: serverName,
+            receiverTeam: receivingTeamId,
+            receiverPlayer: receiverName,
+            scoreA_before: gameState.teamA.score,
+            scoreB_before: gameState.teamB.score,
+            setsA: gameState.teamA.sets,
+            setsB: gameState.teamB.sets
+        };
     }
 
     function sendToBackend() {

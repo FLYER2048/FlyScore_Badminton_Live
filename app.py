@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import os
 import json
 import sys
+import threading
 
 # 判断是否为打包环境
 if getattr(sys, 'frozen', False):
@@ -33,6 +34,8 @@ for d in DIRS.values():
         os.makedirs(d)
 
 GAME_STATE_FILE = os.path.join(OUTPUT_DIR, 'game_state.json')
+MATCH_LOG_FILE = os.path.join(OUTPUT_DIR, 'match_log.json')
+log_lock = threading.Lock()
 
 def write_txt(category, filename, content):
     """
@@ -108,6 +111,58 @@ def update_status():
     write_txt('scores', 'score_points_combined.txt', f"{data.get('points_a', 0)} - {data.get('points_b', 0)}")
 
     return jsonify({"status": "success"})
+
+@app.route('/api/log_event', methods=['POST'])
+def log_event():
+    event = request.json
+    
+    with log_lock:
+        # 如果是比赛开始事件，清空日志
+        if event.get('type') == 'match_start':
+            logs = [event]
+            try:
+                with open(MATCH_LOG_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(logs, f, ensure_ascii=False, indent=2)
+                    f.flush()
+                    os.fsync(f.fileno())
+                return jsonify({"status": "success", "message": "Log reset"})
+            except Exception as e:
+                print(f"Error resetting log: {e}")
+                return jsonify({"status": "error", "message": str(e)}), 500
+
+        # 读取现有日志
+        logs = []
+        if os.path.exists(MATCH_LOG_FILE):
+            try:
+                with open(MATCH_LOG_FILE, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    # 移除 NUL 字符，防止文件损坏导致读取失败
+                    content = content.replace('\x00', '')
+                    if content.strip():
+                        try:
+                            logs = json.loads(content)
+                        except json.JSONDecodeError:
+                            print("JSON Decode Error in match_log.json, starting fresh or appending.")
+                            # 如果解析失败，可能是文件截断。
+                            # 这里为了简单起见，如果无法解析，我们尝试保留旧内容（如果需要更复杂的恢复逻辑可以加）
+                            # 但为了保证程序不崩，我们初始化为空列表，这会导致旧日志丢失。
+                            # 更好的做法可能是备份坏文件。
+                            pass
+            except Exception as e:
+                print(f"Error reading log: {e}")
+        
+        logs.append(event)
+        
+        try:
+            with open(MATCH_LOG_FILE, 'w', encoding='utf-8') as f:
+                json.dump(logs, f, ensure_ascii=False, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+        except Exception as e:
+            print(f"Error writing log: {e}")
+            return jsonify({"status": "error", "message": str(e)}), 500
+            
+        return jsonify({"status": "success"})
 
 if __name__ == '__main__':
     # 打包后禁用 debug
