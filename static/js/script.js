@@ -268,6 +268,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 加分逻辑
     function addScore(team) {
+        // Prevent score changes if match is not active
+        if (!gameState.isActive) {
+            return;
+        }
+        
         // Capture info BEFORE score update
         const rallyInfo = getCurrentRallyInfo();
 
@@ -316,6 +321,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 showReferee(`比赛结束! ${scoringTeam.name} 获胜!`);
+                
+                // Disable all controls when match ends
+                gameState.isActive = false;
+                setControlsState(false);
+                
+                // Update start button to show "开始比赛" instead of "重置比赛"
+                const btnStart = document.getElementById('btnStartMatch');
+                if(btnStart) {
+                    btnStart.textContent = "开始比赛";
+                    btnStart.classList.remove('btn-danger');
+                    btnStart.classList.add('btn-success');
+                }
             } else {
                 showReferee(`${scoringTeam.name} 赢得该局!`);
                 // 下一局开始，分数归零，交换场地逻辑（这里简化为不交换UI，只重置分数）
