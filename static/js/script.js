@@ -295,6 +295,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 2. 判断是否赢得该局
         if (checkSetWin(scoringTeam.score, otherTeam.score)) {
+            // 先确认是否要结束本局，然后再更新状态
+            const tempSetsA = gameState.teamA.sets + (team === 'A' ? 1 : 0);
+            const tempSetsB = gameState.teamB.sets + (team === 'B' ? 1 : 0);
+            const setsNeeded = Math.ceil(gameState.settings.maxSets / 2);
+            const wouldWinMatch = (tempSetsA >= setsNeeded || tempSetsB >= setsNeeded);
+            
+            let confirmMessage;
+            if (wouldWinMatch) {
+                // 整场比赛结束确认
+                confirmMessage = `${scoringTeam.name} 赢得本局!\n\n整场比赛结束，${scoringTeam.name} 获胜 (${tempSetsA}:${tempSetsB})!\n\n确认结束比赛吗？`;
+            } else {
+                // 本局结束但比赛继续，需要确认
+                confirmMessage = `${scoringTeam.name} 赢得本局 (${gameState.teamA.score}:${gameState.teamB.score})!\n\n当前大比分: ${gameState.teamA.name} ${tempSetsA}:${tempSetsB} ${gameState.teamB.name}\n\n确认结束本局并开始下一局吗？`;
+            }
+            
+            if (!confirm(confirmMessage)) {
+                // 用户取消，使用undo恢复状态
+                undo();
+                return;
+            }
+            
+            // 用户确认，继续执行
             scoringTeam.sets++;
             
             // Log Set End
@@ -308,16 +330,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 局间重置分数，但保留大比分
             if (checkMatchWin()) {
-                // 整场比赛结束确认
-                if (!confirm(`${scoringTeam.name} 赢得本局!\n\n整场比赛结束，${scoringTeam.name} 获胜 (${gameState.teamA.sets}:${gameState.teamB.sets})!\n\n确认结束比赛吗？`)) {
-                    // 用户取消，撤销本局胜利
-                    scoringTeam.sets--;
-                    scoringTeam.score--;
-                    updateUI();
-                    sendToBackend();
-                    return;
-                }
-                
                 // Set end time
                 const timeStr = getNowDateTimeLocal();
                 els.endTime.value = timeStr;
@@ -344,16 +356,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     btnStart.classList.add('btn-success');
                 }
             } else {
-                // 本局结束但比赛继续，需要确认
-                if (!confirm(`${scoringTeam.name} 赢得本局 (${gameState.teamA.score}:${gameState.teamB.score})!\n\n当前大比分: ${gameState.teamA.name} ${gameState.teamA.sets}:${gameState.teamB.sets} ${gameState.teamB.name}\n\n确认结束本局并开始下一局吗？`)) {
-                    // 用户取消，撤销本局胜利
-                    scoringTeam.sets--;
-                    scoringTeam.score--;
-                    updateUI();
-                    sendToBackend();
-                    return;
-                }
-                
                 showReferee(`${scoringTeam.name} 赢得该局!`);
                 // 下一局开始，分数归零，交换场地逻辑（这里简化为不交换UI，只重置分数）
                 // 实际比赛中需要交换场地，这里为了简单，假设用户手动处理或不处理
