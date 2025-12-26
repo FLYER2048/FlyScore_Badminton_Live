@@ -308,6 +308,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // 局间重置分数，但保留大比分
             if (checkMatchWin()) {
+                // 整场比赛结束确认
+                if (!confirm(`${scoringTeam.name} 赢得本局!\n\n整场比赛结束，${scoringTeam.name} 获胜 (${gameState.teamA.sets}:${gameState.teamB.sets})!\n\n确认结束比赛吗？`)) {
+                    // 用户取消，撤销本局胜利
+                    scoringTeam.sets--;
+                    scoringTeam.score--;
+                    updateUI();
+                    sendToBackend();
+                    return;
+                }
+                
                 // Set end time
                 const timeStr = getNowDateTimeLocal();
                 els.endTime.value = timeStr;
@@ -334,6 +344,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     btnStart.classList.add('btn-success');
                 }
             } else {
+                // 本局结束但比赛继续，需要确认
+                if (!confirm(`${scoringTeam.name} 赢得本局 (${gameState.teamA.score}:${gameState.teamB.score})!\n\n当前大比分: ${gameState.teamA.name} ${gameState.teamA.sets}:${gameState.teamB.sets} ${gameState.teamB.name}\n\n确认结束本局并开始下一局吗？`)) {
+                    // 用户取消，撤销本局胜利
+                    scoringTeam.sets--;
+                    scoringTeam.score--;
+                    updateUI();
+                    sendToBackend();
+                    return;
+                }
+                
                 showReferee(`${scoringTeam.name} 赢得该局!`);
                 // 下一局开始，分数归零，交换场地逻辑（这里简化为不交换UI，只重置分数）
                 // 实际比赛中需要交换场地，这里为了简单，假设用户手动处理或不处理
