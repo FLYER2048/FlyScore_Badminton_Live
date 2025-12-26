@@ -295,6 +295,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 2. 判断是否赢得该局
         if (checkSetWin(scoringTeam.score, otherTeam.score)) {
+            // 先确认是否要结束本局，然后再更新状态
+            const tempSetsA = gameState.teamA.sets + (team === 'A' ? 1 : 0);
+            const tempSetsB = gameState.teamB.sets + (team === 'B' ? 1 : 0);
+            const setsNeeded = Math.ceil(gameState.settings.maxSets / 2);
+            const wouldWinMatch = (tempSetsA >= setsNeeded || tempSetsB >= setsNeeded);
+            
+            let confirmMessage;
+            if (wouldWinMatch) {
+                // 整场比赛结束确认
+                confirmMessage = `${scoringTeam.name} 赢得本局!\n\n整场比赛结束，${scoringTeam.name} 获胜 (${tempSetsA}:${tempSetsB})!\n\n确认结束比赛吗？`;
+            } else {
+                // 本局结束但比赛继续，需要确认
+                confirmMessage = `${scoringTeam.name} 赢得本局 (${gameState.teamA.score}:${gameState.teamB.score})!\n\n当前大比分: ${gameState.teamA.name} ${tempSetsA}:${tempSetsB} ${gameState.teamB.name}\n\n确认结束本局并开始下一局吗？`;
+            }
+            
+            if (!confirm(confirmMessage)) {
+                // 用户取消，使用undo恢复状态
+                undo();
+                return;
+            }
+            
+            // 用户确认，继续执行
             scoringTeam.sets++;
             
             // Log Set End
