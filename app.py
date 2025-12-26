@@ -170,4 +170,4 @@ if __name__ == '__main__':
     if not debug_mode:
         print("FlyScore Server is running on http://127.0.0.1:5000")
         print("Close this window to stop the server.")
-    app.run(debug=debug_mode, host='0.0.0.0', port=5001)
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
