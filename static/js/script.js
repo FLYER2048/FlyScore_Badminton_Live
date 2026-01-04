@@ -595,9 +595,23 @@ document.addEventListener('DOMContentLoaded', function() {
             renderPlayer(leftTeamObj, p1Zone, leftTeamObj.p1);
             renderPlayer(leftTeamObj, p2Zone, leftTeamObj.p2);
         } else {
-            const pos = leftTeamObj.score % 2;
-            const zone = pos === 1 ? leftZones.odd : leftZones.even;
-            renderPlayer(leftTeamObj, zone, leftTeamObj.p1);
+            // 单打模式：根据发球方来确定位置
+            const servingTeamId = gameState.servingTeam;
+            const leftTeamId = gameState.leftSideTeam;
+            
+            // 如果左侧队伍是发球方，位置根据其得分；否则位置根据对手得分的对角线
+            if (leftTeamId === servingTeamId) {
+                const pos = leftTeamObj.score % 2;
+                const zone = pos === 1 ? leftZones.odd : leftZones.even;
+                renderPlayer(leftTeamObj, zone, leftTeamObj.p1);
+            } else {
+                // 左侧是接发球方，右侧是发球方
+                const serverPos = rightTeamObj.score % 2;
+                // 单打接发球规则：偶数分在右区接发，奇数分在左区接发（与发球方同侧/对角）
+                const receiverPos = serverPos; 
+                const zone = receiverPos === 1 ? leftZones.odd : leftZones.even;
+                renderPlayer(leftTeamObj, zone, leftTeamObj.p1);
+            }
         }
 
         // 渲染右侧队伍
@@ -608,9 +622,23 @@ document.addEventListener('DOMContentLoaded', function() {
             renderPlayer(rightTeamObj, p1Zone, rightTeamObj.p1);
             renderPlayer(rightTeamObj, p2Zone, rightTeamObj.p2);
         } else {
-            const pos = rightTeamObj.score % 2;
-            const zone = pos === 1 ? rightZones.odd : rightZones.even;
-            renderPlayer(rightTeamObj, zone, rightTeamObj.p1);
+            // 单打模式
+            const servingTeamId = gameState.servingTeam;
+            const rightTeamId = gameState.leftSideTeam === 'A' ? 'B' : 'A';
+
+            if (rightTeamId === servingTeamId) {
+                // 右侧是发球方
+                const pos = rightTeamObj.score % 2;
+                const zone = pos === 1 ? rightZones.odd : rightZones.even;
+                renderPlayer(rightTeamObj, zone, rightTeamObj.p1);
+            } else {
+                // 右侧是接发球方，左侧是发球方
+                const serverPos = leftTeamObj.score % 2;
+                // 单打接发球规则：偶数分在右区接发，奇数分在左区接发（与发球方同侧/对角）
+                const receiverPos = serverPos;
+                const zone = receiverPos === 1 ? rightZones.odd : rightZones.even;
+                renderPlayer(rightTeamObj, zone, rightTeamObj.p1);
+            }
         }
 
         // 高亮发球人和接发球人
