@@ -89,7 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
             a_even: document.getElementById('zone_0_0'), // Bottom Left
             b_even: document.getElementById('zone_1_1'), // Top Right
             b_odd: document.getElementById('zone_1_0')   // Bottom Right
-        }
+        },
+        previousSetsContainer: document.getElementById('previousSetsContainer')
     };
 
     // 初始化绑定
@@ -682,6 +683,29 @@ document.addEventListener('DOMContentLoaded', function() {
         if (serverZone) {
              const nameDiv = serverZone.querySelector('div');
              if (nameDiv) nameDiv.classList.add('server-indicator');
+        }
+
+        // 更新历史局分
+        if (els.previousSetsContainer) {
+            els.previousSetsContainer.innerHTML = '';
+            if (gameState.previousSets && gameState.previousSets.length > 0) {
+                 gameState.previousSets.forEach(set => {
+                    const span = document.createElement('span');
+                    span.className = 'badge bg-light text-dark border';
+                    // 为了更清晰，可以加 Set X 
+                    // span.textContent = `S${set.set_number}: ${set.score_a}-${set.score_b}`;
+                    span.textContent = `${set.score_a}:${set.score_b}`;
+                    
+                    if (set.winner === 'A') {
+                       span.style.borderLeft = `4px solid ${gameState.teamA.color}`;
+                       span.style.color = gameState.teamA.color; // text color match winner? maybe just border
+                    } else if (set.winner === 'B') {
+                       span.style.borderRight = `4px solid ${gameState.teamB.color}`;
+                    }
+                    
+                    els.previousSetsContainer.appendChild(span);
+                 });
+            }
         }
 
         updateCourtHighlights();
