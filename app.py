@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import os
 import json
 import sys
@@ -163,6 +163,13 @@ def log_event():
             return jsonify({"status": "error", "message": str(e)}), 500
             
         return jsonify({"status": "success"})
+
+@app.route('/api/download_log')
+def download_log():
+    if os.path.exists(MATCH_LOG_FILE):
+        return send_file(MATCH_LOG_FILE, as_attachment=True, download_name='match_log.json')
+    else:
+        return jsonify({"error": "Log file not found"}), 404
 
 if __name__ == '__main__':
     # 打包后禁用 debug
