@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         servingTeam: 'A', // 'A' or 'B'
         serverPlayer: 'p1', // 'p1' or 'p2' (当前发球人)
         leftSideTeam: 'A', // 'A' or 'B' (当前在左侧场地的队伍)
+        previousSets: [], // List to store scores of previous sets
         isActive: false
     };
 
@@ -156,6 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.teamB.score = 0;
             gameState.teamA.sets = 0;
             gameState.teamB.sets = 0;
+            gameState.previousSets = [];
             historyStack = [];
             
             setControlsState(false); // 禁用比赛控制，启用输入框
@@ -212,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.serverPlayer = 'p1';
         gameState.leftSideTeam = 'A';
         gameState.isActive = true;
+        gameState.previousSets = [];
         historyStack = [];
 
         // Log Match Start
@@ -319,6 +322,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // 用户确认，继续执行
             scoringTeam.sets++;
             
+            // Record this set's score before resetting logic might clear it (though reset happens later)
+            gameState.previousSets.push({
+                set_number: gameState.teamA.sets + gameState.teamB.sets,
+                score_a: gameState.teamA.score,
+                score_b: gameState.teamB.score,
+                winner: team
+            });
+
             // Log Set End
             logEvent('set_end', {
                  winner: team,
@@ -868,6 +879,7 @@ document.addEventListener('DOMContentLoaded', function() {
             status_message: els.matchStatus.textContent,
             
             // New fields
+            previous_sets: gameState.previousSets,
             event_name: gameState.matchInfo.eventName,
             match_stage: gameState.matchInfo.stage,
             match_venue: gameState.matchInfo.venue,
