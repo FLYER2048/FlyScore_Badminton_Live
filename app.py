@@ -52,6 +52,10 @@ def write_txt(category, filename, content):
 def index():
     return render_template('index.html')
 
+@app.route('/scoreboard')
+def scoreboard():
+    return render_template('scoreboard.html')
+
 @app.route('/api/get_state', methods=['GET'])
 def get_state():
     if os.path.exists(GAME_STATE_FILE):
