@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboard - FlyScore</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/scoreboard.css') }}">
+</head>
+<body>
+    <div class="scoreboard-container">
+        <!-- Header: Event Info -->
+        <header class="header-info">
+            <span class="match-title" id="eventName">Event Name</span>
+            <span id="matchStage">Group Stage</span>
+        </header>
+
+        <div class="main-content">
+            <!-- Team A -->
+            <div class="team-panel">
+                <div id="teamAColorBar" style="width: 100%; height: 10px; background: red; margin-bottom: 20px; border-radius: 5px;"></div>
+                <div class="team-name" id="teamAName">TEAM A</div>
+                <div class="players-list" id="playersA">
+                    <!-- JS populated -->
+                </div>
+                <div class="serve-indicator" id="serveA">🏸</div>
+                <div class="sets-display">Sets: <span id="setsA">0</span></div>
+            </div>
+
+            <!-- Scores -->
+            <div class="score-panel">
+                <div class="score-display" id="scoreA">0</div>
+                
+                <div class="fullscreen-trigger" id="btnFullscreen" title="点击切换全屏">
+                    <div class="score-divider">-</div>
+                    <div class="fs-icon">⛶</div>
+                </div>
+
+                <div class="score-display" id="scoreB">0</div>
+            </div>
+
+            <!-- Team B -->
+            <div class="team-panel">
+                 <div id="teamBColorBar" style="width: 100%; height: 10px; background: blue; margin-bottom: 20px; border-radius: 5px;"></div>
+                <div class="team-name" id="teamBName">TEAM B</div>
+                <div class="players-list" id="playersB">
+                    <!-- JS populated -->
+                </div>
+                <div class="serve-indicator" id="serveB">🏸</div>
+                <div class="sets-display">Sets: <span id="setsB">0</span></div>
+            </div>
+        </div>
+
+        <!-- Footer: History & Status -->
+        <footer class="footer-info">
+            <div class="set-history" id="historyContainer">
+                <!-- JS populated: History items like "21-19" -->
+            </div>
+            <div class="match-status-text" id="matchStatus"></div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/scoreboard.js') }}"></script>
+</body>
+</html>
