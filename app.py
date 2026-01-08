@@ -52,10 +52,6 @@ def write_txt(category, filename, content):
 def index():
     return render_template('index.html')
 
-@app.route('/scoreboard')
-def scoreboard():
-    return render_template('scoreboard.html')
-
 @app.route('/api/get_state', methods=['GET'])
 def get_state():
     if os.path.exists(GAME_STATE_FILE):
@@ -181,4 +177,4 @@ if __name__ == '__main__':
     if not debug_mode:
         print("FlyScore Server is running on http://127.0.0.1:5000")
         print("Close this window to stop the server.")
-    app.run(debug=debug_mode, host='0.0.0.0', port=5001)
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
