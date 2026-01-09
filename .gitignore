@@ -6,6 +6,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+*.spec
+build/
+dist/
 
 # Virtual environment
 venv/
