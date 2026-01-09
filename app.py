@@ -3,6 +3,9 @@ import os
 import json
 import sys
 import threading
+# import pandas
+from openpyxl import load_workbook
+from datetime import datetime
 
 # 判断是否为打包环境
 if getattr(sys, 'frozen', False):
@@ -36,6 +39,73 @@ for d in DIRS.values():
 GAME_STATE_FILE = os.path.join(OUTPUT_DIR, 'game_state.json')
 MATCH_LOG_FILE = os.path.join(OUTPUT_DIR, 'match_log.json')
 log_lock = threading.Lock()
+
+class Create_Scoretable:
+    template_path = os.path.join(BASE_DIR, 'templates', 'scoretable_template.xlsx')
+    output_path = os.path.join(BASE_DIR, 'scoretable_output.xlsx')
+
+    def __init__(self, match_log_path=None):
+        self.match_log = match_log_path if match_log_path is not None else []
+        
+        try:
+            with open(match_log_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            self.match_log = data
+        except FileNotFoundError:
+            print(f"文件不存在: {match_log_path}")
+            return []
+        except json.JSONDecodeError as e:
+            print(f"JSON解析错误: {e}")
+            return []
+        except Exception as e:
+            print(f"读取文件时出错: {e}")
+            return []
+        
+        self.metadata = self.match_log[0]["details"]
+        self.endTime = datetime.strptime(self.metadata["match_info"].get("endTime", ""), "%Y-%m-%dT%H:%M")
+        self.eventName = self.metadata["match_info"].get("eventName", "")
+        self.serviceJudge = self.metadata["match_info"].get("serviceJudge", "")
+        self.stage = self.metadata["match_info"].get("stage", "")
+        self.startTime = datetime.strptime(self.metadata["match_info"].get("startTime", ""), "%Y-%m-%dT%H:%M")
+        self.match_duation = self.endTime - self.startTime
+        self.umpire = self.metadata["match_info"].get("umpire", "")
+        self.venue = self.metadata["match_info"].get("venue", "")
+
+        self.playerA1 = self.metadata["team_a"].get("p1", "")
+        self.playerA2 = self.metadata["team_a"].get("p2", "")
+        self.teamA = self.metadata["team_a"].get("name", "")
+        self.playerB1 = self.metadata["team_b"].get("p1", "")
+        self.playerB2 = self.metadata["team_b"].get("p2", "")
+        self.teamB = self.metadata["team_b"].get("name", "")
+        # 读取模板
+        self.wb = load_workbook(self.template_path)
+        self.ws = self.wb.active
+
+    def add_metadata(self):
+        self.ws['F4'] = self.eventName
+        self.ws['F6'] = self.venue
+        self.ws['F7'] = f"{self.startTime.month}.{self.startTime.day} {self.startTime.hour}:{self.startTime.minute}"
+        self.ws['AQ4'] = self.umpire
+        self.ws['AR5'] = self.serviceJudge
+        self.ws['AP6'] = f"{self.startTime.hour}:{self.startTime.minute}"
+        self.ws['AT6'] = f"{self.endTime.hour}:{self.endTime.minute}"
+        self.ws['AR7'] = int(self.match_duation.total_seconds() / 60 + 0.5)
+
+        self.ws['M5'] = self.playerA1
+        self.ws['M6'] = self.playerA2
+        self.ws['M7'] = self.teamA
+        self.ws['AB5'] = self.playerB1
+        self.ws['AB6'] = self.playerB2
+        self.ws['AB7'] = self.teamB
+
+        # 填充选手名单到每局
+        for i in range(5):
+            self.ws[f'B{9+i*5}'] = self.playerA1
+            self.ws[f'B{10+i*5}'] = self.playerA2
+            self.ws[f'B{11+i*5}'] = self.playerB1
+            self.ws[f'B{12+i*5}'] = self.playerB2
+        self.wb.save(self.output_path)
+
 
 def write_txt(category, filename, content):
     """
