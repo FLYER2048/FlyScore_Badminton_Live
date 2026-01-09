@@ -46,13 +46,19 @@ class Create_Scoretable:
 
     def __init__(self, match_log_path=None):
         self.match_log = match_log_path if match_log_path is not None else []
-        
+        self.get_match_data()
+        self.add_metadata()
+        self.add_scores()
+        self.wb.save(self.output_path)
+
+
+    def get_match_data(self):
         try:
-            with open(match_log_path, 'r', encoding='utf-8') as f:
+            with open(self.match_log_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
             self.match_log = data
         except FileNotFoundError:
-            print(f"文件不存在: {match_log_path}")
+            print(f"文件不存在: {self.match_log_path}")
             return []
         except json.JSONDecodeError as e:
             print(f"JSON解析错误: {e}")
@@ -104,8 +110,9 @@ class Create_Scoretable:
             self.ws[f'B{10+i*5}'] = self.playerA2
             self.ws[f'B{11+i*5}'] = self.playerB1
             self.ws[f'B{12+i*5}'] = self.playerB2
-        self.wb.save(self.output_path)
 
+    def add_scores(self):
+        pass
 
 def write_txt(category, filename, content):
     """
