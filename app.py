@@ -43,7 +43,6 @@ log_lock = threading.Lock()
 
 class Create_Scoretable:
     template_path = os.path.join(BASE_DIR, 'templates', 'scoretable_template.xlsx')
-    output_path = os.path.join(BASE_DIR, 'scoretable_output.xlsx')
 
     def __init__(self, match_log_path=None):
         self.match_log_path = match_log_path if match_log_path is not None else []
@@ -55,6 +54,7 @@ class Create_Scoretable:
         self.add_metadata() # 添加元数据
         self.add_scores() # 添加比分数据
 
+        self.output_path = os.path.join(BASE_DIR, '记分表_' + (self.eventName or '') + datetime.now().strftime("%Y%m%d%H%M%S") + '.xlsx')
         self.wb.save(self.output_path) # 保存输出文件
 
     def get_match_data(self):
@@ -75,13 +75,13 @@ class Create_Scoretable:
         self.metadata = self.match_log[0]["details"]
 
         self.endTime = datetime.strptime(self.metadata["match_info"].get("endTime", "") or self.match_log[-1].get("timestamp", ""), "%Y-%m-%dT%H:%M")
-        self.eventName = self.metadata["match_info"].get("eventName", "")
-        self.serviceJudge = self.metadata["match_info"].get("serviceJudge", "")
-        self.stage = self.metadata["match_info"].get("stage", "")
+        self.eventName = self.metadata["match_info"].get("eventName", "") or "N/A"
+        self.serviceJudge = self.metadata["match_info"].get("serviceJudge", "") or "N/A"
+        self.stage = self.metadata["match_info"].get("stage", "") or "N/A"
         self.startTime = datetime.strptime(self.metadata["match_info"].get("startTime", "") or "2026-01-01T00:00", "%Y-%m-%dT%H:%M")
         self.match_duation = self.endTime - self.startTime
-        self.umpire = self.metadata["match_info"].get("umpire", "")
-        self.venue = self.metadata["match_info"].get("venue", "")
+        self.umpire = self.metadata["match_info"].get("umpire", "") or "N/A"
+        self.venue = self.metadata["match_info"].get("venue", "") or "N/A"
 
         self.playerA1 = self.metadata["team_a"].get("p1", "")
         self.playerA2 = self.metadata["team_a"].get("p2", "")
