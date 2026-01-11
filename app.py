@@ -54,7 +54,7 @@ class Create_Scoretable:
         self.add_metadata() # 添加元数据
         self.add_scores() # 添加比分数据
 
-        self.output_path = os.path.join(BASE_DIR, '记分表_' + (self.eventName or '') + datetime.now().strftime("%Y%m%d%H%M%S") + '.xlsx')
+        self.output_path = os.path.join(BASE_DIR, '记分表_' + (self.eventName.replace('/', '_') or 'NA') + "_" + datetime.now().strftime("%Y%m%d%H%M%S") + '.xlsx')
         self.wb.save(self.output_path) # 保存输出文件
 
     def get_match_data(self):

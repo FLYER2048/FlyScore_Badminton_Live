@@ -1,6 +1,6 @@
 # FlyScore Badminton Live - 羽毛球比赛计分系统
 
-FlyScore是一个基于Flask的球赛计分系统，FlyScore Badminton专为羽毛球比赛直播设计。它提供了一个直观的操作界面来管理比分、站位和比赛状态，并实时生成TXT文件供OBS等直播软件读取。
+FlyScore是一个基于Flask的球赛计分系统，FlyScore Badminton专为羽毛球比赛直播设计。它提供了一个直观的操作界面来管理比分、站位和比赛状态，并实时生成TXT文件供OBS等直播软件读取，亦可输出规范的记分表。
 
 ## 功能特点
 
@@ -11,6 +11,7 @@ FlyScore是一个基于Flask的球赛计分系统，FlyScore Badminton专为羽�
 *   **断点续传**：刷新页面或更换设备，比赛进度自动同步，不会丢失数据。
 *   **赛事管理**：支持录入赛事名称、阶段、地点、裁判姓名及比赛时间。
 *   **辅助功能**：支持撤销误操作、交换场地、手动换发球权。
+*   **导出比分**：支持导出json格式的比赛日志和Excel格式的记分表
 
 <img width="2523" height="1599" alt="image" src="https://github.com/user-attachments/assets/6fc8e02a-b2a9-4963-bb28-0257ca353615" />
 
@@ -61,6 +62,9 @@ python app.py
     *   `start_time.txt`: 开始时间
     *   `end_time.txt`: 结束时间
     *   `match_status.txt`: 比赛状态 (如 "关键分", "局点")
+*   **`output/` (json数据)**
+    *   `game_state.json`: 当前比赛状态
+    *   `match_log.json`: 完整的比赛日志
 
 ## 操作说明
 
@@ -85,6 +89,10 @@ FlyScore_Badminton_Live3/
 │   └── js/
 │       └── script.js   # 核心逻辑
 └── templates/
-    └── index.html      # 前端界面
+    ├── index.html      # 前端界面
+    │
+    ├── scoreboard.html # 比分板界面
+    │
+    └── scoreboard.xlsx # 比分板Excel模板
 ```
 
