@@ -68,18 +68,18 @@ class CreateScoretable:
                 raise ValueError(f"无效的比赛数据: {self.match_log_path}")
             
             self.match_log = data
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             print(f"文件不存在: {self.match_log_path}")
             # 重新抛出异常，防止后续逻辑在无效状态下继续执行
-            raise e
+            raise
         except json.JSONDecodeError as e:
             print(f"JSON解析错误: {e}")
             # 重新抛出异常，防止后续逻辑在无效状态下继续执行
-            raise e
+            raise
         except Exception as e:
             print(f"读取文件时出错: {e}")
             # 重新抛出异常，防止后续逻辑在无效状态下继续执行
-            raise e
+            raise
         
         # 提取元数据
         self.metadata = self.match_log[0]["details"]
@@ -98,7 +98,14 @@ class CreateScoretable:
         self.eventName = self.metadata["match_info"].get("eventName", "") or "N/A"
         self.serviceJudge = self.metadata["match_info"].get("serviceJudge", "") or "N/A"
         self.stage = self.metadata["match_info"].get("stage", "") or "N/A"
-        self.startTime = datetime.strptime(self.metadata["match_info"].get("startTime", "") or self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M")
+        
+        start_time_str = self.metadata["match_info"].get("startTime", "") or self.DEFAULT_DATETIME
+        try:
+            self.startTime = datetime.strptime(start_time_str, "%Y-%m-%dT%H:%M")
+        except ValueError:
+            # 如果时间格式不符合预期，则使用默认时间避免程序崩溃
+            self.startTime = datetime.strptime(self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M")
+        
         self.match_duration = self.endTime - self.startTime
         self.umpire = self.metadata["match_info"].get("umpire", "") or "N/A"
         self.venue = self.metadata["match_info"].get("venue", "") or "N/A"
