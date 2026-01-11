@@ -3,7 +3,7 @@ import os
 import json
 import sys
 import threading
-# import pandas
+
 from openpyxl import load_workbook
 from openpyxl.cell.cell import MergedCell
 from datetime import datetime
@@ -41,8 +41,9 @@ GAME_STATE_FILE = os.path.join(OUTPUT_DIR, 'game_state.json')
 MATCH_LOG_FILE = os.path.join(OUTPUT_DIR, 'match_log.json')
 log_lock = threading.Lock()
 
-class Create_Scoretable:
+class CreateScoretable:
     template_path = os.path.join(BASE_DIR, 'templates', 'scoretable_template.xlsx')
+    DEFAULT_DATETIME = "2026-01-01T00:00"
 
     def __init__(self, match_log_path=None):
         self.match_log_path = match_log_path if match_log_path is not None else MATCH_LOG_FILE
@@ -61,26 +62,51 @@ class Create_Scoretable:
         try:
             with open(self.match_log_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
+            
+            # 确保数据格式正确且非空
+            if not isinstance(data, list) or not data:
+                raise ValueError(f"无效的比赛数据: {self.match_log_path}")
+            
             self.match_log = data
         except FileNotFoundError:
             print(f"文件不存在: {self.match_log_path}")
-            return []
+            # 重新抛出异常，防止后续逻辑在无效状态下继续执行
+            raise
         except json.JSONDecodeError as e:
             print(f"JSON解析错误: {e}")
-            return []
+            # 重新抛出异常，防止后续逻辑在无效状态下继续执行
+            raise
         except Exception as e:
             print(f"读取文件时出错: {e}")
-            return []
+            # 重新抛出异常，防止后续逻辑在无效状态下继续执行
+            raise
         
         # 提取元数据
         self.metadata = self.match_log[0]["details"]
         # 提取赛事信息
-        self.endTime = datetime.strptime(self.metadata["match_info"].get("endTime", "") or self.match_log[-1].get("timestamp", ""), "%Y-%m-%dT%H:%M")
+        end_time_str = self.metadata["match_info"].get("endTime", "") or self.match_log[-1].get("timestamp", "")
+        if end_time_str:
+            try:
+                self.endTime = datetime.strptime(end_time_str, "%Y-%m-%dT%H:%M")
+            except ValueError:
+                # 如果时间格式不符合预期，则使用默认时间避免程序崩溃
+                self.endTime = datetime.strptime(self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M")
+        else:
+            # 当 endTime 和 timestamp 都为空时，使用默认时间
+            self.endTime = datetime.strptime(self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M")
+        
         self.eventName = self.metadata["match_info"].get("eventName", "") or "N/A"
         self.serviceJudge = self.metadata["match_info"].get("serviceJudge", "") or "N/A"
         self.stage = self.metadata["match_info"].get("stage", "") or "N/A"
-        self.startTime = datetime.strptime(self.metadata["match_info"].get("startTime", "") or "2026-01-01T00:00", "%Y-%m-%dT%H:%M")
-        self.match_duation = self.endTime - self.startTime
+        
+        start_time_str = self.metadata["match_info"].get("startTime", "") or self.DEFAULT_DATETIME
+        try:
+            self.startTime = datetime.strptime(start_time_str, "%Y-%m-%dT%H:%M")
+        except ValueError:
+            # 如果时间格式不符合预期，则使用默认时间避免程序崩溃
+            self.startTime = datetime.strptime(self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M")
+        
+        self.match_duration = self.endTime - self.startTime
         self.umpire = self.metadata["match_info"].get("umpire", "") or "N/A"
         self.venue = self.metadata["match_info"].get("venue", "") or "N/A"
         # 提取选手信息
@@ -109,9 +135,6 @@ class Create_Scoretable:
 
         self.scores = valid_events
 
-    def new_method(self):
-        pass
-
     def add_metadata(self):
         self.ws['F4'] = self.eventName
         self.ws['F6'] = self.venue
@@ -120,7 +143,7 @@ class Create_Scoretable:
         self.ws['AR5'] = self.serviceJudge
         self.ws['AP6'] = f"{self.startTime.hour:02}:{self.startTime.minute:02}"
         self.ws['AT6'] = f"{self.endTime.hour:02}:{self.endTime.minute:02}"
-        self.ws['AR7'] = int(self.match_duation.total_seconds() / 60 + 0.5)
+        self.ws['AR7'] = int(self.match_duration.total_seconds() / 60 + 0.5)
 
         self.ws['M5'] = self.playerA1
         self.ws['M6'] = self.playerA2
@@ -148,14 +171,14 @@ class Create_Scoretable:
     def get_write_pos(self, row, col):
         # 检查是否为合并单元格（需要跳过）
         while isinstance(self.ws.cell(row=row, column=col), MergedCell):
-                col += 1
+            col += 1
         
         # 计算当前单元格跨度
         span = 1
         for rng in self.ws.merged_cells.ranges:
             if row == rng.min_row and col == rng.min_col:
-                    span = rng.max_col - rng.min_col + 1
-                    break
+                span = rng.max_col - rng.min_col + 1
+                break
         return col, span
 
     def add_scores(self):
@@ -409,7 +432,7 @@ def download_log():
 def generate_scoretable():
     try:
         # 使用当前的 MATCH_LOG_FILE
-        generator = Create_Scoretable()
+        generator = CreateScoretable()
         # 获取生成的文件名
         filename = os.path.basename(generator.output_path)
         return jsonify({"status": "success", "filename": filename})
@@ -419,10 +442,14 @@ def generate_scoretable():
 
 @app.route('/api/download_scoretable/<filename>')
 def download_scoretable(filename):
-    # 确保文件名安全，这里简单假设文件都在 BASE_DIR
-    file_path = os.path.join(BASE_DIR, filename)
+    # 确保文件名安全：将输入限制为基础文件名并拒绝路径遍历
+    safe_filename = os.path.basename(filename)
+    # 如果归一化后文件名发生变化或为空，则视为非法
+    if not safe_filename or safe_filename != filename or safe_filename in (".", ".."):
+        return jsonify({"error": "Invalid filename"}), 400
+    file_path = os.path.join(BASE_DIR, safe_filename)
     if os.path.exists(file_path):
-        return send_file(file_path, as_attachment=True, download_name=filename)
+        return send_file(file_path, as_attachment=True, download_name=safe_filename)
     else:
         return jsonify({"error": "File not found"}), 404
 

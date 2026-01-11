@@ -93,6 +93,6 @@ FlyScore_Badminton_Live3/
     │
     ├── scoreboard.html # 比分板界面
     │
-    └── scoreboard.xlsx # 比分板Excel模板
+    └── scoretable_template.xlsx # 比分板Excel模板
 ```
 
