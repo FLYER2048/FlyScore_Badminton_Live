@@ -109,6 +109,7 @@
                         <button id="btnSwapSides" class="btn btn-warning" disabled>交换场地</button>
                         <button id="btnChangeServer" class="btn btn-info" disabled>手动换发球权</button>
                         <a href="/api/download_log" class="btn btn-dark">下载比赛日志</a>
+                        <button id="btnOpenScoreSheetModal" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#scoreSheetModal">记分表</button>
                     </div>
                 </div>
             </div>
@@ -218,6 +219,26 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 记分表模态框 -->
+    <div class="modal fade" id="scoreSheetModal" tabindex="-1" aria-labelledby="scoreSheetModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scoreSheetModalLabel">生成记分表</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>点击下方按钮生成 Excel 格式的记分表。</p>
+                    <div id="generateStatus" class="mb-3"></div>
+                    <div class="d-grid gap-2">
+                        <button id="btnGenerateScoreSheet" class="btn btn-primary">生成记分表</button>
+                        <a id="btnDownloadScoreSheet" href="#" class="btn btn-success disabled">下载记分表</a>
                     </div>
                 </div>
             </div>
