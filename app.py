@@ -72,8 +72,9 @@ class Create_Scoretable:
             print(f"读取文件时出错: {e}")
             return []
         
+        # 提取元数据
         self.metadata = self.match_log[0]["details"]
-
+        # 提取赛事信息
         self.endTime = datetime.strptime(self.metadata["match_info"].get("endTime", "") or self.match_log[-1].get("timestamp", ""), "%Y-%m-%dT%H:%M")
         self.eventName = self.metadata["match_info"].get("eventName", "") or "N/A"
         self.serviceJudge = self.metadata["match_info"].get("serviceJudge", "") or "N/A"
@@ -82,7 +83,7 @@ class Create_Scoretable:
         self.match_duation = self.endTime - self.startTime
         self.umpire = self.metadata["match_info"].get("umpire", "") or "N/A"
         self.venue = self.metadata["match_info"].get("venue", "") or "N/A"
-
+        # 提取选手信息
         self.playerA1 = self.metadata["team_a"].get("p1", "")
         self.playerA2 = self.metadata["team_a"].get("p2", "")
         self.teamA = self.metadata["team_a"].get("name", "")
@@ -90,6 +91,11 @@ class Create_Scoretable:
         self.playerB2 = self.metadata["team_b"].get("p2", "")
         self.teamB = self.metadata["team_b"].get("name", "")
 
+        # 提取每局最终比分
+        self.final_scores = [entry for entry in self.match_log if entry.get("type") == "set_end"]
+        self.final_scores_str = [f"{_['details']['scoreA']}-{_['details']['scoreB']}" for _ in self.final_scores]
+
+        # 处理比分日志，考虑撤销操作
         # 只保留 point 和 undo 操作，以应对局中可能的其他手动操作干扰
         process_log = [entry for entry in self.match_log if entry.get("type") in ["point", "undo"]]
 
@@ -109,11 +115,11 @@ class Create_Scoretable:
     def add_metadata(self):
         self.ws['F4'] = self.eventName
         self.ws['F6'] = self.venue
-        self.ws['F7'] = f"{self.startTime.month}.{self.startTime.day} {self.startTime.hour}:{self.startTime.minute}"
+        self.ws['F7'] = f"{self.startTime.month}.{self.startTime.day} {self.startTime.hour:02}:{self.startTime.minute:02}"
         self.ws['AQ4'] = self.umpire
         self.ws['AR5'] = self.serviceJudge
-        self.ws['AP6'] = f"{self.startTime.hour}:{self.startTime.minute}"
-        self.ws['AT6'] = f"{self.endTime.hour}:{self.endTime.minute}"
+        self.ws['AP6'] = f"{self.startTime.hour:02}:{self.startTime.minute:02}"
+        self.ws['AT6'] = f"{self.endTime.hour:02}:{self.endTime.minute:02}"
         self.ws['AR7'] = int(self.match_duation.total_seconds() / 60 + 0.5)
 
         self.ws['M5'] = self.playerA1
@@ -153,6 +159,11 @@ class Create_Scoretable:
         return col, span
 
     def add_scores(self):
+        # 写入最终比分
+        for i, final_score in enumerate(self.final_scores_str):
+            self.ws.cell(row=5+i, column=24, value=final_score)
+
+        # 以下是详细比分
         col_indices = [3] * 5
         initialized_sets = set()
 
