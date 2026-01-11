@@ -45,7 +45,7 @@ class Create_Scoretable:
     template_path = os.path.join(BASE_DIR, 'templates', 'scoretable_template.xlsx')
 
     def __init__(self, match_log_path=None):
-        self.match_log_path = match_log_path if match_log_path is not None else []
+        self.match_log_path = match_log_path if match_log_path is not None else MATCH_LOG_FILE
         self.get_match_data() # 获取比赛数据
 
         self.wb = load_workbook(self.template_path) # 读取模板
@@ -404,6 +404,27 @@ def download_log():
         return send_file(MATCH_LOG_FILE, as_attachment=True, download_name='match_log.json')
     else:
         return jsonify({"error": "Log file not found"}), 404
+
+@app.route('/api/generate_scoretable', methods=['POST'])
+def generate_scoretable():
+    try:
+        # 使用当前的 MATCH_LOG_FILE
+        generator = Create_Scoretable()
+        # 获取生成的文件名
+        filename = os.path.basename(generator.output_path)
+        return jsonify({"status": "success", "filename": filename})
+    except Exception as e:
+        print(f"Error generating scoretable: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+@app.route('/api/download_scoretable/<filename>')
+def download_scoretable(filename):
+    # 确保文件名安全，这里简单假设文件都在 BASE_DIR
+    file_path = os.path.join(BASE_DIR, filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, as_attachment=True, download_name=filename)
+    else:
+        return jsonify({"error": "File not found"}), 404
 
 if __name__ == '__main__':
     # 打包后禁用 debug
