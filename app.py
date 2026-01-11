@@ -43,6 +43,7 @@ log_lock = threading.Lock()
 
 class CreateScoretable:
     template_path = os.path.join(BASE_DIR, 'templates', 'scoretable_template.xlsx')
+    DEFAULT_DATETIME = "2026-01-01T00:00"
 
     def __init__(self, match_log_path=None):
         self.match_log_path = match_log_path if match_log_path is not None else MATCH_LOG_FILE
@@ -80,11 +81,6 @@ class CreateScoretable:
             # 重新抛出异常，防止后续逻辑在无效状态下继续执行
             raise e
         
-        # 校验 match_log 是否为非空列表，避免 IndexError
-        if not isinstance(self.match_log, list) or not self.match_log:
-            print(f"比赛日志为空或格式不正确: {self.match_log_path}")
-            raise ValueError(f"比赛日志为空或格式不正确: {self.match_log_path}")
-        
         # 提取元数据
         self.metadata = self.match_log[0]["details"]
         # 提取赛事信息
@@ -94,15 +90,15 @@ class CreateScoretable:
                 self.endTime = datetime.strptime(end_time_str, "%Y-%m-%dT%H:%M")
             except ValueError:
                 # 如果时间格式不符合预期，则使用默认时间避免程序崩溃
-                self.endTime = datetime.strptime("2026-01-01T00:00", "%Y-%m-%dT%H:%M")
+                self.endTime = datetime.strptime(self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M")
         else:
             # 当 endTime 和 timestamp 都为空时，使用默认时间
-            self.endTime = datetime.strptime("2026-01-01T00:00", "%Y-%m-%dT%H:%M")
+            self.endTime = datetime.strptime(self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M")
         
         self.eventName = self.metadata["match_info"].get("eventName", "") or "N/A"
         self.serviceJudge = self.metadata["match_info"].get("serviceJudge", "") or "N/A"
         self.stage = self.metadata["match_info"].get("stage", "") or "N/A"
-        self.startTime = datetime.strptime(self.metadata["match_info"].get("startTime", "") or "2026-01-01T00:00", "%Y-%m-%dT%H:%M")
+        self.startTime = datetime.strptime(self.metadata["match_info"].get("startTime", "") or self.DEFAULT_DATETIME, "%Y-%m-%dT%H:%M")
         self.match_duration = self.endTime - self.startTime
         self.umpire = self.metadata["match_info"].get("umpire", "") or "N/A"
         self.venue = self.metadata["match_info"].get("venue", "") or "N/A"
