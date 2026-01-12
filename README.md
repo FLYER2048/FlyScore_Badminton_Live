@@ -90,9 +90,8 @@ FlyScore_Badminton_Live3/
 │       └── script.js   # 核心逻辑
 └── templates/
     ├── index.html      # 前端界面
-    │
     ├── scoreboard.html # 比分板界面
-    │
     └── scoretable_template.xlsx # 比分板Excel模板
 ```
+
 
