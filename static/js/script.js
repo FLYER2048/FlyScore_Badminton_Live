@@ -976,6 +976,41 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(err => console.error('Error loading state:', err));
     }
 
+    // --- Score Sheet Logic ---
+    const btnGenerateScoreSheet = document.getElementById('btnGenerateScoreSheet');
+    const btnDownloadScoreSheet = document.getElementById('btnDownloadScoreSheet');
+    const generateStatus = document.getElementById('generateStatus');
+
+    if (btnGenerateScoreSheet) {
+        btnGenerateScoreSheet.addEventListener('click', function() {
+            generateStatus.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><br>正在生成...';
+            btnGenerateScoreSheet.disabled = true;
+            btnDownloadScoreSheet.classList.add('disabled');
+            btnDownloadScoreSheet.href = "#";
+
+            fetch('/api/generate_scoretable', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    generateStatus.innerHTML = '<span class="text-success fw-bold">✓ 生成成功!</span>';
+                    btnDownloadScoreSheet.href = '/api/download_scoretable/' + data.filename;
+                    btnDownloadScoreSheet.classList.remove('disabled');
+                } else {
+                    generateStatus.innerHTML = '<span class="text-danger">生成失败: ' + (data.message || 'Unknown error') + '</span>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                generateStatus.innerHTML = '<span class="text-danger">请求错误</span>';
+            })
+            .finally(() => {
+                btnGenerateScoreSheet.disabled = false;
+            });
+        });
+    }
+
     // 尝试加载上次的状态
     loadStateFromBackend();
 });
