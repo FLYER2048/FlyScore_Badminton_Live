@@ -57,19 +57,23 @@ document.addEventListener('DOMContentLoaded', function() {
         els.matchStage.textContent = data.matchInfo?.stage || '';
         els.matchStatus.textContent = data.status_message || '';
         
-        let displayTeamA = isSwapped ? data.teamB : data.teamA;
-        let displayTeamB = isSwapped ? data.teamA : data.teamB;
+        // Combine backend swap state with manual perspective swap
+        let backendWantsBOnLeft = (data.leftSideTeam === 'B');
+        let effectiveSwap = backendWantsBOnLeft !== isSwapped;
+
+        let displayTeamA = effectiveSwap ? data.teamB : data.teamA;
+        let displayTeamB = effectiveSwap ? data.teamA : data.teamB;
 
         // Team A (Left)
-        els.teamAName.textContent = displayTeamA.name || (isSwapped ? 'Team B' : 'Team A');
-        els.teamAColorBar.style.backgroundColor = displayTeamA.color || (isSwapped ? '#0d6efd' : '#dc3545');
+        els.teamAName.textContent = displayTeamA.name || (effectiveSwap ? 'Team B' : 'Team A');
+        els.teamAColorBar.style.backgroundColor = displayTeamA.color || (effectiveSwap ? '#0d6efd' : '#dc3545');
         renderPlayers(els.playersA, displayTeamA, data.mode);
         els.scoreA.textContent = displayTeamA.score ?? 0;
         els.setsA.textContent = displayTeamA.sets ?? 0;
         
         // Team B (Right)
-        els.teamBName.textContent = displayTeamB.name || (isSwapped ? 'Team A' : 'Team B');
-        els.teamBColorBar.style.backgroundColor = displayTeamB.color || (isSwapped ? '#dc3545' : '#0d6efd');
+        els.teamBName.textContent = displayTeamB.name || (effectiveSwap ? 'Team A' : 'Team B');
+        els.teamBColorBar.style.backgroundColor = displayTeamB.color || (effectiveSwap ? '#dc3545' : '#0d6efd');
         renderPlayers(els.playersB, displayTeamB, data.mode);
         els.scoreB.textContent = displayTeamB.score ?? 0;
         els.setsB.textContent = displayTeamB.sets ?? 0;
@@ -78,14 +82,9 @@ document.addEventListener('DOMContentLoaded', function() {
         let serveLeft = false;
         let serveRight = false;
         if (data.servingTeam === 'A') {
-            if (isSwapped) serveRight = true; else serveLeft = true;
+            if (effectiveSwap) serveRight = true; else serveLeft = true;
         } else if (data.servingTeam === 'B') {
-            if (isSwapped) serveLeft = true; else serveRight = true;
-        }
-
-        if (serveLeft) {
-            els.serveA.classList.add('active');
-        } else {
+            if (effectiveSwap) serveLeft = true; else serveRight = true;
             els.serveA.classList.remove('active');
         }
         
@@ -96,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // History
-        renderHistory(data.previousSets);
+        renderHistory(data.previousSets, effectiveSwap);
     }
 
     function renderPlayers(container, teamData, mode) {
@@ -116,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function renderHistory(previousSets) {
+    function renderHistory(previousSets, effectiveSwap) {
         // previousSets is array of {scoreA, scoreB}
         els.historyContainer.innerHTML = '';
         
@@ -127,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // script.js uses snake_case (score_a, score_b) for previousSets
                 const sA = set.score_a !== undefined ? set.score_a : set.scoreA;
                 const sB = set.score_b !== undefined ? set.score_b : set.scoreB;
-                if (isSwapped) {
+                if (effectiveSwap) {
                     item.textContent = `${sB} - ${sA}`;
                 } else {
                     item.textContent = `${sA} - ${sB}`;
