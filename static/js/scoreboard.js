@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const updateInterval = 1000; // 1 second
+    let isSwapped = false;
+    let lastData = null;
 
     // Elements
     const els = {
@@ -24,10 +26,19 @@ document.addEventListener('DOMContentLoaded', function() {
         matchStatus: document.getElementById('matchStatus')
     };
 
+    const btnSwap = document.getElementById('btnSwap');
+    if (btnSwap) {
+        btnSwap.addEventListener('click', () => {
+            isSwapped = !isSwapped;
+            if (lastData) render(lastData);
+        });
+    }
+
     function updateScoreboard() {
         fetch('/api/get_state')
             .then(response => response.json())
             .then(data => {
+                lastData = data;
                 render(data);
             })
             .catch(err => console.error('Error fetching state:', err));
@@ -45,31 +56,42 @@ document.addEventListener('DOMContentLoaded', function() {
         els.eventName.textContent = data.matchInfo?.eventName || '';
         els.matchStage.textContent = data.matchInfo?.stage || '';
         els.matchStatus.textContent = data.status_message || '';
-
-        // Team A
-        els.teamAName.textContent = data.teamA.name || 'Team A';
-        els.teamAColorBar.style.backgroundColor = data.teamA.color || '#dc3545';
-        renderPlayers(els.playersA, data.teamA, data.mode);
-        els.scoreA.textContent = data.teamA.score ?? 0;
-        els.setsA.textContent = data.teamA.sets ?? 0;
         
-        // Team B
-        els.teamBName.textContent = data.teamB.name || 'Team B';
-        els.teamBColorBar.style.backgroundColor = data.teamB.color || '#0d6efd';
-        renderPlayers(els.playersB, data.teamB, data.mode);
-        els.scoreB.textContent = data.teamB.score ?? 0;
-        els.setsB.textContent = data.teamB.sets ?? 0;
+        let displayTeamA = isSwapped ? data.teamB : data.teamA;
+        let displayTeamB = isSwapped ? data.teamA : data.teamB;
+
+        // Team A (Left)
+        els.teamAName.textContent = displayTeamA.name || (isSwapped ? 'Team B' : 'Team A');
+        els.teamAColorBar.style.backgroundColor = displayTeamA.color || (isSwapped ? '#0d6efd' : '#dc3545');
+        renderPlayers(els.playersA, displayTeamA, data.mode);
+        els.scoreA.textContent = displayTeamA.score ?? 0;
+        els.setsA.textContent = displayTeamA.sets ?? 0;
+        
+        // Team B (Right)
+        els.teamBName.textContent = displayTeamB.name || (isSwapped ? 'Team A' : 'Team B');
+        els.teamBColorBar.style.backgroundColor = displayTeamB.color || (isSwapped ? '#dc3545' : '#0d6efd');
+        renderPlayers(els.playersB, displayTeamB, data.mode);
+        els.scoreB.textContent = displayTeamB.score ?? 0;
+        els.setsB.textContent = displayTeamB.sets ?? 0;
 
         // Serve Indicator
-        // Logic: if game is active, show who is serving
+        let serveLeft = false;
+        let serveRight = false;
         if (data.servingTeam === 'A') {
-            els.serveA.classList.add('active');
-            els.serveB.classList.remove('active');
+            if (isSwapped) serveRight = true; else serveLeft = true;
         } else if (data.servingTeam === 'B') {
-            els.serveA.classList.remove('active');
-            els.serveB.classList.add('active');
+            if (isSwapped) serveLeft = true; else serveRight = true;
+        }
+
+        if (serveLeft) {
+            els.serveA.classList.add('active');
         } else {
             els.serveA.classList.remove('active');
+        }
+        
+        if (serveRight) {
+            els.serveB.classList.add('active');
+        } else {
             els.serveB.classList.remove('active');
         }
 
@@ -105,7 +127,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // script.js uses snake_case (score_a, score_b) for previousSets
                 const sA = set.score_a !== undefined ? set.score_a : set.scoreA;
                 const sB = set.score_b !== undefined ? set.score_b : set.scoreB;
-                item.textContent = `${sA} - ${sB}`;
+                if (isSwapped) {
+                    item.textContent = `${sB} - ${sA}`;
+                } else {
+                    item.textContent = `${sA} - ${sB}`;
+                }
                 els.historyContainer.appendChild(item);
             });
         }
