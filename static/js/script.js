@@ -162,6 +162,12 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.previousSets = [];
             historyStack = [];
             
+            // 清空开始时间和结束时间
+            els.startTime.value = '';
+            els.endTime.value = '';
+            gameState.matchInfo.startTime = '';
+            gameState.matchInfo.endTime = '';
+            
             setControlsState(false); // 禁用比赛控制，启用输入框
             updateUI();
             sendToBackend();

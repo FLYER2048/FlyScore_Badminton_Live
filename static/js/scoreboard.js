@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const updateInterval = 1000; // 1 second
+    let isSwapped = false;
+    let lastData = null;
 
     // Elements
     const els = {
@@ -24,10 +26,19 @@ document.addEventListener('DOMContentLoaded', function() {
         matchStatus: document.getElementById('matchStatus')
     };
 
+    const btnSwap = document.getElementById('btnSwap');
+    if (btnSwap) {
+        btnSwap.addEventListener('click', () => {
+            isSwapped = !isSwapped;
+            if (lastData) render(lastData);
+        });
+    }
+
     function updateScoreboard() {
         fetch('/api/get_state')
             .then(response => response.json())
             .then(data => {
+                lastData = data;
                 render(data);
             })
             .catch(err => console.error('Error fetching state:', err));
@@ -46,35 +57,50 @@ document.addEventListener('DOMContentLoaded', function() {
         els.matchStage.textContent = data.matchInfo?.stage || '';
         els.matchStatus.textContent = data.status_message || '';
 
-        // Team A
-        els.teamAName.textContent = data.teamA.name || 'Team A';
-        els.teamAColorBar.style.backgroundColor = data.teamA.color || '#dc3545';
-        renderPlayers(els.playersA, data.teamA, data.mode);
-        els.scoreA.textContent = data.teamA.score ?? 0;
-        els.setsA.textContent = data.teamA.sets ?? 0;
+        // Combine backend swap state with manual perspective swap
+        let backendWantsBOnLeft = (data.leftSideTeam === 'B');
+        let effectiveSwap = backendWantsBOnLeft !== isSwapped;
+
+        let displayTeamA = effectiveSwap ? data.teamB : data.teamA;
+        let displayTeamB = effectiveSwap ? data.teamA : data.teamB;
+
+        // Team A (Left)
+        els.teamAName.textContent = displayTeamA.name || (effectiveSwap ? 'Team B' : 'Team A');
+        els.teamAColorBar.style.backgroundColor = displayTeamA.color || (effectiveSwap ? '#0d6efd' : '#dc3545');
+        renderPlayers(els.playersA, displayTeamA, data.mode);
+        els.scoreA.textContent = displayTeamA.score ?? 0;
+        els.setsA.textContent = displayTeamA.sets ?? 0;
         
-        // Team B
-        els.teamBName.textContent = data.teamB.name || 'Team B';
-        els.teamBColorBar.style.backgroundColor = data.teamB.color || '#0d6efd';
-        renderPlayers(els.playersB, data.teamB, data.mode);
-        els.scoreB.textContent = data.teamB.score ?? 0;
-        els.setsB.textContent = data.teamB.sets ?? 0;
+        // Team B (Right)
+        els.teamBName.textContent = displayTeamB.name || (effectiveSwap ? 'Team A' : 'Team B');
+        els.teamBColorBar.style.backgroundColor = displayTeamB.color || (effectiveSwap ? '#dc3545' : '#0d6efd');
+        renderPlayers(els.playersB, displayTeamB, data.mode);
+        els.scoreB.textContent = displayTeamB.score ?? 0;
+        els.setsB.textContent = displayTeamB.sets ?? 0;
 
         // Serve Indicator
-        // Logic: if game is active, show who is serving
+        let serveLeft = false;
+        let serveRight = false;
         if (data.servingTeam === 'A') {
-            els.serveA.classList.add('active');
-            els.serveB.classList.remove('active');
+            if (effectiveSwap) serveRight = true; else serveLeft = true;
         } else if (data.servingTeam === 'B') {
-            els.serveA.classList.remove('active');
-            els.serveB.classList.add('active');
+            if (effectiveSwap) serveLeft = true; else serveRight = true;
+        }
+
+        if (serveLeft) {
+            els.serveA.classList.add('active');
         } else {
             els.serveA.classList.remove('active');
+        }
+
+        if (serveRight) {
+            els.serveB.classList.add('active');
+        } else {
             els.serveB.classList.remove('active');
         }
 
         // History
-        renderHistory(data.previousSets);
+        renderHistory(data.previousSets, effectiveSwap);
     }
 
     function renderPlayers(container, teamData, mode) {
@@ -94,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function renderHistory(previousSets) {
+    function renderHistory(previousSets, effectiveSwap) {
         // previousSets is array of {scoreA, scoreB}
         els.historyContainer.innerHTML = '';
         
@@ -105,7 +131,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // script.js uses snake_case (score_a, score_b) for previousSets
                 const sA = set.score_a !== undefined ? set.score_a : set.scoreA;
                 const sB = set.score_b !== undefined ? set.score_b : set.scoreB;
-                item.textContent = `${sA} - ${sB}`;
+                if (effectiveSwap) {
+                    item.textContent = `${sB} - ${sA}`;
+                } else {
+                    item.textContent = `${sA} - ${sB}`;
+                }
                 els.historyContainer.appendChild(item);
             });
         }
