@@ -1,5 +1,6 @@
 # Output files generated during runtime
 output/
+记分表*.xlsx
 
 # Python cache
 __pycache__/

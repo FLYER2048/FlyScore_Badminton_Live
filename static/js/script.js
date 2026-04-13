@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let gameState = {
         mode: 'MS',
         matchInfo: {
+            matchType: '',
             eventName: '',
             stage: '',
             venue: '',
@@ -178,6 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.mode = els.mode.value;
 
         // Capture Match Info
+        gameState.matchInfo.matchType = els.mode.options[els.mode.selectedIndex].text;
         gameState.matchInfo.eventName = els.eventName.value;
         gameState.matchInfo.stage = els.matchStage.value;
         gameState.matchInfo.venue = els.matchVenue.value;
@@ -904,6 +906,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // New fields
             previous_sets: gameState.previousSets,
+            match_type: gameState.matchInfo.matchType,
             event_name: gameState.matchInfo.eventName,
             match_stage: gameState.matchInfo.stage,
             match_venue: gameState.matchInfo.venue,

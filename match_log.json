@@ -1,0 +1,633 @@
+[
+  {
+    "type": "match_start",
+    "timestamp": "2026-01-06T21:25",
+    "details": {
+      "match_info": {
+        "endTime": "2026-01-06T21:23",
+        "eventName": "XD01",
+        "serviceJudge": "Cwen",
+        "stage": "Semi-Final",
+        "startTime": "2026-01-06T20:43",
+        "umpire": "Flyer",
+        "venue": "Laoshan #3"
+      },
+      "settings": {
+        "capPoints": 30,
+        "maxSets": 3,
+        "pointsPerSet": 21
+      },
+      "team_a": {
+        "name": "Team A",
+        "p1": "容",
+        "p2": "庄"
+      },
+      "team_b": {
+        "name": "Team B",
+        "p1": "航",
+        "p2": "曦"
+      }
+    }
+  },
+  {
+    "type": "manual_change",
+    "timestamp": "2026-01-06T21:26",
+    "details": {
+      "action": "swap_players",
+      "team": "A",
+      "newPositions": {
+        "p1": 1,
+        "p2": 0
+      }
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:26",
+    "details": {
+      "winner": "B",
+      "serverTeam": "A",
+      "serverPlayer": "庄",
+      "receiverTeam": "B",
+      "receiverPlayer": "航",
+      "scoreA_before": 0,
+      "scoreB_before": 0,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 0,
+      "newScoreB": 1
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:27",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 0,
+      "scoreB_before": 1,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 0,
+      "newScoreB": 2
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:27",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "庄",
+      "scoreA_before": 0,
+      "scoreB_before": 2,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 0,
+      "newScoreB": 3
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:27",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 0,
+      "scoreB_before": 3,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 0,
+      "newScoreB": 4
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:27",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "庄",
+      "scoreA_before": 0,
+      "scoreB_before": 4,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 0,
+      "newScoreB": 5
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:28",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 0,
+      "scoreB_before": 5,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 0,
+      "newScoreB": 6
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:28",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "庄",
+      "scoreA_before": 0,
+      "scoreB_before": 6,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 0,
+      "newScoreB": 7
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:28",
+    "details": {
+      "winner": "A",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 0,
+      "scoreB_before": 7,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 1,
+      "newScoreB": 7
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:28",
+    "details": {
+      "winner": "A",
+      "serverTeam": "A",
+      "serverPlayer": "容",
+      "receiverTeam": "B",
+      "receiverPlayer": "曦",
+      "scoreA_before": 1,
+      "scoreB_before": 7,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 2,
+      "newScoreB": 7
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:29",
+    "details": {
+      "winner": "A",
+      "serverTeam": "A",
+      "serverPlayer": "容",
+      "receiverTeam": "B",
+      "receiverPlayer": "航",
+      "scoreA_before": 2,
+      "scoreB_before": 7,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 3,
+      "newScoreB": 7
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:29",
+    "details": {
+      "winner": "A",
+      "serverTeam": "A",
+      "serverPlayer": "容",
+      "receiverTeam": "B",
+      "receiverPlayer": "曦",
+      "scoreA_before": 3,
+      "scoreB_before": 7,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 4,
+      "newScoreB": 7
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:29",
+    "details": {
+      "winner": "B",
+      "serverTeam": "A",
+      "serverPlayer": "容",
+      "receiverTeam": "B",
+      "receiverPlayer": "航",
+      "scoreA_before": 4,
+      "scoreB_before": 7,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 4,
+      "newScoreB": 8
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:30",
+    "details": {
+      "winner": "A",
+      "serverTeam": "B",
+      "serverPlayer": "航",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 4,
+      "scoreB_before": 8,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 5,
+      "newScoreB": 8
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:30",
+    "details": {
+      "winner": "B",
+      "serverTeam": "A",
+      "serverPlayer": "庄",
+      "receiverTeam": "B",
+      "receiverPlayer": "曦",
+      "scoreA_before": 5,
+      "scoreB_before": 8,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 5,
+      "newScoreB": 9
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:30",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "庄",
+      "scoreA_before": 5,
+      "scoreB_before": 9,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 5,
+      "newScoreB": 10
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:31",
+    "details": {
+      "winner": "A",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 5,
+      "scoreB_before": 10,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 6,
+      "newScoreB": 10
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:31",
+    "details": {
+      "winner": "B",
+      "serverTeam": "A",
+      "serverPlayer": "容",
+      "receiverTeam": "B",
+      "receiverPlayer": "曦",
+      "scoreA_before": 6,
+      "scoreB_before": 10,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 6,
+      "newScoreB": 11
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:31",
+    "details": {
+      "winner": "A",
+      "serverTeam": "B",
+      "serverPlayer": "航",
+      "receiverTeam": "A",
+      "receiverPlayer": "庄",
+      "scoreA_before": 6,
+      "scoreB_before": 11,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 7,
+      "newScoreB": 11
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:31",
+    "details": {
+      "winner": "A",
+      "serverTeam": "A",
+      "serverPlayer": "庄",
+      "receiverTeam": "B",
+      "receiverPlayer": "航",
+      "scoreA_before": 7,
+      "scoreB_before": 11,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 8,
+      "newScoreB": 11
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:32",
+    "details": {
+      "winner": "A",
+      "serverTeam": "A",
+      "serverPlayer": "庄",
+      "receiverTeam": "B",
+      "receiverPlayer": "曦",
+      "scoreA_before": 8,
+      "scoreB_before": 11,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 9,
+      "newScoreB": 11
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:32",
+    "details": {
+      "winner": "B",
+      "serverTeam": "A",
+      "serverPlayer": "庄",
+      "receiverTeam": "B",
+      "receiverPlayer": "航",
+      "scoreA_before": 9,
+      "scoreB_before": 11,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 9,
+      "newScoreB": 12
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:32",
+    "details": {
+      "winner": "A",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 9,
+      "scoreB_before": 12,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 10,
+      "newScoreB": 12
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:32",
+    "details": {
+      "winner": "B",
+      "serverTeam": "A",
+      "serverPlayer": "容",
+      "receiverTeam": "B",
+      "receiverPlayer": "曦",
+      "scoreA_before": 10,
+      "scoreB_before": 12,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 10,
+      "newScoreB": 13
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:33",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "航",
+      "receiverTeam": "A",
+      "receiverPlayer": "庄",
+      "scoreA_before": 10,
+      "scoreB_before": 13,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 10,
+      "newScoreB": 14
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:33",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "航",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 10,
+      "scoreB_before": 14,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 10,
+      "newScoreB": 15
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:33",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "航",
+      "receiverTeam": "A",
+      "receiverPlayer": "庄",
+      "scoreA_before": 10,
+      "scoreB_before": 15,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 10,
+      "newScoreB": 16
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:33",
+    "details": {
+      "winner": "A",
+      "serverTeam": "B",
+      "serverPlayer": "航",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 10,
+      "scoreB_before": 16,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 11,
+      "newScoreB": 16
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:34",
+    "details": {
+      "winner": "A",
+      "serverTeam": "A",
+      "serverPlayer": "庄",
+      "receiverTeam": "B",
+      "receiverPlayer": "曦",
+      "scoreA_before": 11,
+      "scoreB_before": 16,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 12,
+      "newScoreB": 16
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:34",
+    "details": {
+      "winner": "B",
+      "serverTeam": "A",
+      "serverPlayer": "庄",
+      "receiverTeam": "B",
+      "receiverPlayer": "航",
+      "scoreA_before": 12,
+      "scoreB_before": 16,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 12,
+      "newScoreB": 17
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:35",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 12,
+      "scoreB_before": 17,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 12,
+      "newScoreB": 18
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:35",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "庄",
+      "scoreA_before": 12,
+      "scoreB_before": 18,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 12,
+      "newScoreB": 19
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:35",
+    "details": {
+      "winner": "A",
+      "serverTeam": "B",
+      "serverPlayer": "曦",
+      "receiverTeam": "A",
+      "receiverPlayer": "容",
+      "scoreA_before": 12,
+      "scoreB_before": 19,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 13,
+      "newScoreB": 19
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:35",
+    "details": {
+      "winner": "B",
+      "serverTeam": "A",
+      "serverPlayer": "容",
+      "receiverTeam": "B",
+      "receiverPlayer": "曦",
+      "scoreA_before": 13,
+      "scoreB_before": 19,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 13,
+      "newScoreB": 20
+    }
+  },
+  {
+    "type": "point",
+    "timestamp": "2026-01-06T21:36",
+    "details": {
+      "winner": "B",
+      "serverTeam": "B",
+      "serverPlayer": "航",
+      "receiverTeam": "A",
+      "receiverPlayer": "庄",
+      "scoreA_before": 13,
+      "scoreB_before": 20,
+      "setsA": 0,
+      "setsB": 0,
+      "newScoreA": 13,
+      "newScoreB": 21
+    }
+  },
+  {
+    "type": "set_end",
+    "timestamp": "2026-01-06T21:36",
+    "details": {
+      "winner": "B",
+      "scoreA": 13,
+      "scoreB": 21,
+      "setsA": 0,
+      "setsB": 1
+    }
+  }
+]
