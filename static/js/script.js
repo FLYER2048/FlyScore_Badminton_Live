@@ -364,6 +364,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 showReferee(`比赛结束! ${scoringTeam.name} 获胜!`);
                 
+                // 清空开始时间和结束时间
+                els.startTime.value = '';
+                els.endTime.value = '';
+                gameState.matchInfo.startTime = '';
+                gameState.matchInfo.endTime = '';
+                
                 // Disable all controls when match ends
                 gameState.isActive = false;
                 setControlsState(false);

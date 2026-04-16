@@ -458,6 +458,6 @@ if __name__ == '__main__':
     # 打包后禁用 debug
     debug_mode = not getattr(sys, 'frozen', False)
     if not debug_mode:
-        print("FlyScore Server is running on http://127.0.0.1:5000")
+        print("FlyScore Server is running on http://127.0.0.1:5101")
         print("Close this window to stop the server.")
-    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
+    app.run(debug=debug_mode, host='0.0.0.0', port=5101)
