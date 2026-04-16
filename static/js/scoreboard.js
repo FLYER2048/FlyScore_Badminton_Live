@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         els.eventName.textContent = data.matchInfo?.eventName || '';
         els.matchStage.textContent = data.matchInfo?.stage || '';
         els.matchStatus.textContent = data.status_message || '';
-        
+
         // Combine backend swap state with manual perspective swap
         let backendWantsBOnLeft = (data.leftSideTeam === 'B');
         let effectiveSwap = backendWantsBOnLeft !== isSwapped;
@@ -77,6 +77,12 @@ document.addEventListener('DOMContentLoaded', function() {
         renderPlayers(els.playersB, displayTeamB, data.mode);
         els.scoreB.textContent = displayTeamB.score ?? 0;
         els.setsB.textContent = displayTeamB.sets ?? 0;
+        // Team B (Right)
+        els.teamBName.textContent = displayTeamB.name || (effectiveSwap ? 'Team A' : 'Team B');
+        els.teamBColorBar.style.backgroundColor = displayTeamB.color || (effectiveSwap ? '#dc3545' : '#0d6efd');
+        renderPlayers(els.playersB, displayTeamB, data.mode);
+        els.scoreB.textContent = displayTeamB.score ?? 0;
+        els.setsB.textContent = displayTeamB.sets ?? 0;
 
         // Serve Indicator
         let serveLeft = false;
@@ -85,9 +91,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (effectiveSwap) serveRight = true; else serveLeft = true;
         } else if (data.servingTeam === 'B') {
             if (effectiveSwap) serveLeft = true; else serveRight = true;
+        }
+
+        if (serveLeft) {
+            els.serveA.classList.add('active');
+        } else {
             els.serveA.classList.remove('active');
         }
-        
+
         if (serveRight) {
             els.serveB.classList.add('active');
         } else {

@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/scoreboard.css') }}">
 </head>
 <body>
-    <button id="btnSwap" title="点击交换队伍位置" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 5px 10px; cursor: pointer; border-radius: 3px; z-index: 10;">⇄ 交换位置</button>
     <div class="scoreboard-container">
         <!-- Header: Event Info -->
         <header class="header-info">
@@ -32,12 +31,12 @@
                 <div class="score-display" id="scoreA">0</div>
                 
                 <div class="center-controls">
-                    <div class="fullscreen-trigger" id="btnSwap" title="点击交换队伍位置">
-                        <div class="fs-icon">⇄</div>
-                    </div>
-                    <div class="score-divider">-</div>
                     <div class="fullscreen-trigger" id="btnFullscreen" title="点击切换全屏">
                         <div class="fs-icon">⛶</div>
+                    </div>
+                    <div class="fullscreen-trigger score-divider">-</div>
+                    <div class="fullscreen-trigger" id="btnSwap" title="点击交换队伍位置">
+                        <div class="fs-icon">⇄</div>
                     </div>
                 </div>
 

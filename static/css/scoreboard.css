@@ -229,7 +229,7 @@ body {
 @media (max-width: 800px) {
     .team-name { font-size: 6vw; }
     .players-list { font-size: 4vw; }
-    .score-display { font-size: 20vw; }
+    .score-display { font-size: 25vw; }
     .history-item { font-size: 3vw; }
     .match-status-text { font-size: 3vw; }
 }

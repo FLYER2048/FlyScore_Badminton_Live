@@ -97,7 +97,7 @@ class CreateScoretable:
         
         self.eventName = self.metadata["match_info"].get("eventName", "") or "N/A"
         self.serviceJudge = self.metadata["match_info"].get("serviceJudge", "") or "N/A"
-        self.stage = self.metadata["match_info"].get("stage", "") or "N/A"
+        self.match_type = self.metadata["match_info"].get("matchType", "") or "N/A"
         
         start_time_str = self.metadata["match_info"].get("startTime", "") or self.DEFAULT_DATETIME
         try:
@@ -137,6 +137,7 @@ class CreateScoretable:
 
     def add_metadata(self):
         self.ws['F4'] = self.eventName
+        self.ws['F5'] = self.match_type
         self.ws['F6'] = self.venue
         self.ws['F7'] = f"{self.startTime.month}.{self.startTime.day} {self.startTime.hour:02}:{self.startTime.minute:02}"
         self.ws['AQ4'] = self.umpire
@@ -457,6 +458,6 @@ if __name__ == '__main__':
     # 打包后禁用 debug
     debug_mode = not getattr(sys, 'frozen', False)
     if not debug_mode:
-        print("FlyScore Server is running on http://127.0.0.1:5000")
+        print("FlyScore Server is running on http://127.0.0.1:5101")
         print("Close this window to stop the server.")
-    app.run(debug=debug_mode, host='0.0.0.0', port=5000)
+    app.run(debug=debug_mode, host='0.0.0.0', port=5101)

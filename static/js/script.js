@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let gameState = {
         mode: 'MS',
         matchInfo: {
+            matchType: '',
             eventName: '',
             stage: '',
             venue: '',
@@ -161,6 +162,12 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.previousSets = [];
             historyStack = [];
             
+            // 清空开始时间和结束时间
+            els.startTime.value = '';
+            els.endTime.value = '';
+            gameState.matchInfo.startTime = '';
+            gameState.matchInfo.endTime = '';
+            
             setControlsState(false); // 禁用比赛控制，启用输入框
             updateUI();
             sendToBackend();
@@ -178,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.mode = els.mode.value;
 
         // Capture Match Info
+        gameState.matchInfo.matchType = els.mode.options[els.mode.selectedIndex].text;
         gameState.matchInfo.eventName = els.eventName.value;
         gameState.matchInfo.stage = els.matchStage.value;
         gameState.matchInfo.venue = els.matchVenue.value;
@@ -355,6 +363,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 showReferee(`比赛结束! ${scoringTeam.name} 获胜!`);
+                
+                // 清空开始时间和结束时间
+                els.startTime.value = '';
+                els.endTime.value = '';
+                gameState.matchInfo.startTime = '';
+                gameState.matchInfo.endTime = '';
                 
                 // Disable all controls when match ends
                 gameState.isActive = false;
@@ -904,6 +918,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // New fields
             previous_sets: gameState.previousSets,
+            match_type: gameState.matchInfo.matchType,
             event_name: gameState.matchInfo.eventName,
             match_stage: gameState.matchInfo.stage,
             match_venue: gameState.matchInfo.venue,
