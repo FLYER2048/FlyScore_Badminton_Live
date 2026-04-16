@@ -77,8 +77,16 @@ document.addEventListener('DOMContentLoaded', function() {
         renderPlayers(els.playersB, displayTeamB, data.mode);
         els.scoreB.textContent = displayTeamB.score ?? 0;
         els.setsB.textContent = displayTeamB.sets ?? 0;
+        // Team B (Right)
+        els.teamBName.textContent = displayTeamB.name || (effectiveSwap ? 'Team A' : 'Team B');
+        els.teamBColorBar.style.backgroundColor = displayTeamB.color || (effectiveSwap ? '#dc3545' : '#0d6efd');
+        renderPlayers(els.playersB, displayTeamB, data.mode);
+        els.scoreB.textContent = displayTeamB.score ?? 0;
+        els.setsB.textContent = displayTeamB.sets ?? 0;
 
         // Serve Indicator
+        let serveLeft = false;
+        let serveRight = false;
         let serveLeft = false;
         let serveRight = false;
         if (data.servingTeam === 'A') {

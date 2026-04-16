@@ -138,6 +138,18 @@ body {
     flex-shrink: 0;
 }
 
+.center-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2vw;
+}
+
+.center-controls .fullscreen-trigger {
+    margin: 0;
+}
+
 .fullscreen-trigger:hover {
     background-color: rgba(255, 255, 255, 0.1);
     transform: scale(1.1);
