@@ -87,8 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Serve Indicator
         let serveLeft = false;
         let serveRight = false;
-        let serveLeft = false;
-        let serveRight = false;
         if (data.servingTeam === 'A') {
             if (effectiveSwap) serveRight = true; else serveLeft = true;
         } else if (data.servingTeam === 'B') {
